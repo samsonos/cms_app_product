@@ -1,6 +1,6 @@
 {
-    "name":"samsonos/cms_app_relatedmaterial",
-    "description":"SamsonCMS RelatedMaterial application",
+    "name":"samsonos/cms_app_product",
+    "description":"SamsonCMS Product application",
     "author":"Pavlo Onysko <onysko@samsonos.com>",
     "require":{
         "samsonos/cms_app":"*"
@@ -10,7 +10,7 @@
     "autoload": {
         "classmap": ["src/"],
         "psr-0": {
-            "samson\\cms\\web\\relatedmaterial": "src/"
+            "samson\\cms\\web\\product": "src/"
         }
     }
 }
