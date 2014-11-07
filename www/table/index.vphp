@@ -1,0 +1,16 @@
+<table id="list" class="table material-table">
+	<thead>
+		<tr>
+			<th class="id">#</th>
+			<th class="name"><?php t('Продукт')?></th>
+			<th class="brand" title="<?php t('Компания') ?>"><?php t('Компания') ?></th>
+            <th class="balance" title="<?php t('Остаток')?>"><?php t('Остаток')?></th>
+            <th class="price" title="<?php t('Цена')?>"><?php t('Цена')?></th>
+            <th class="structure"><?php t('Категория')?></th>
+			<th class="modyfied"><?php t('Создан')?> / <?php t('Изменен')?></th>
+			<th class="published" title="<?php t('Опубликован ли материал')?>"><?php t('Опб')?></th>
+			<th style="width: 90px;" class="control" title="<?php t('Упраление материалом')?>"></th>
+		</tr>
+	</thead>
+	<tbody><?php v('rows'); ?></tbody>		
+</table>

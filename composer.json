@@ -1,66 +1,16 @@
 {
-	"name":"samsonos/cms",
-	"description":"SamsonCMS web-application",
-	"authors":[
-		{
-			"name":"Vitaly Iegorov",
-			"email":"egorov@samsonos.com"
-		}
-	],
-    "minimum-stability":"dev",
-	"require":
-    {
-
+    "name":"samsonos/cms_app_relatedmaterial",
+    "description":"SamsonCMS RelatedMaterial application",
+    "author":"Pavlo Onysko <onysko@samsonos.com>",
+    "require":{
+        "samsonos/cms_app":"*"
     },
-    "require-dev": {
-        "samsonos/php_core":"*",
-        "samsonos/php_activerecord":"*",
-        "samsonos/php_resourcer":"*",
-        "samsonos/php_less":"*",
-        "samsonos/php_i18n":"*",
-        "samsonos/js_core":"*",
-        "samsonos/js_md5":"*",
-        "samsonos/js_lightbox":"*",
-        "samsonos/js_tinybox":"*",
-        "samsonos/js_select":"*",
-        "samsonos/js_treeview":"*",
-        "samsonos/js_fixedheader":"*",
-        "samsonos/js_tabs":"*",
-        "samsonos/js_translit":"*",
-        "samsonos/php_compressor":"*",
-        "samsonos/php_pager":"*",
-        "samsonos/php_deploy":"*",
-        "samsonos/php_scale":"*",
-        "samsonos/php_email":"*",
-        "samsonos/php_upload":"*",
-        "samsonos/social_core":"*",
-        "samsonos/social_email":"*",
-        "samsonos/cms_api":"*",
-        "samsonos/cms_table":"*",
-        "samsonos/cms_app":"*",
-        "samsonos/cms_input":"*",
-        "samsonos/cms_input_date":"*",
-        "samsonos/cms_input_select":"*",
-        "samsonos/cms_input_upload":"*",
-        "samsonos/cms_input_wysiwyg":"*",
-        "samsonos/cms_app_material":"*",
-        "samsonos/cms_app_navigation":"*",
-        "samsonos/cms_app_field":"*",
-        "samsonos/cms_app_user":"*",
-        "samsonos/cms_app_gallery":"*",
-        "samsonos/cms_app_relatedmaterial":"*",
-        "samsonos/cms_app_help":"*",
-        "phpunit/phpunit": "4.0.*",
-        "squizlabs/php_codesniffer": "2.0.*@dev"
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "bash contrib/setup.sh"
-        ]
-    },
+    "license":"Open Software License (OSL) v 3.0",
+    "homepage":"http://samsonos.com/",
     "autoload": {
-        "classmap": ["src/"]
-    },
-	"license":"Open Software License (OSL) v 3.0",
-	"homepage":"http://samsoncms.com/"
+        "classmap": ["src/"],
+        "psr-0": {
+            "samson\\cms\\web\\relatedmaterial": "src/"
+        }
+    }
 }
