@@ -11,12 +11,13 @@
         </h1>
     <?php endif?>
     <input id="cmsnav_id" type="hidden" value="<?php iv('cmsnav_id'); ?>">
+    <input id="company_id" type="hidden" value="<?php if (isv('company_id')) { v('company_id'); } else { echo 0; } ?>">
     <h1 class="icon2 icon_16x16 left icon-material" title="<?php t('Таблица материалов')?>"><?php t('Материалы')?>:</h1>
     <!-- End of Header block -->
 
     <!-- Table search block -->
     <form class="search" method="POST">
-        <input name="search" id="search" controller="material/table/" placeholder="<?php t('Укажите поисковый запрос')?>..." value="<?php iv('search')?>">
+        <input name="search" id="search" controller="product/table/" placeholder="<?php t('Укажите поисковый запрос')?>..." value="<?php iv('search')?>">
         <input type="hidden" class="loader-text" value="<?php t('Выполняется поиск...')?>">
     </form>
     <!-- End of Table search block -->
@@ -35,10 +36,10 @@
 
 <!-- Content section -->
 <section id="content">
-    <div class="products_tree" style="width: 25%; display: inline-block; vertical-align: top;">
+    <div class="products_tree" style="width: 22%; display: inline-block; vertical-align: top;">
         <?php iv('tree'); ?>
     </div>
-    <div class="products_table" style="width: 70%; display: inline-block; vertical-align: top: margin-left: 20px;">
+    <div class="products_table" style="width: 77%; display: inline-block; vertical-align: top;">
         <?php v('table_html'); ?>
     </div>
 </section>

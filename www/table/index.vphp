@@ -7,8 +7,7 @@
             <th class="balance" title="<?php t('Остаток')?>"><?php t('Остаток')?></th>
             <th class="price" title="<?php t('Цена')?>"><?php t('Цена')?></th>
             <th class="structure"><?php t('Категория')?></th>
-			<th class="modyfied"><?php t('Создан')?> / <?php t('Изменен')?></th>
-			<th class="published" title="<?php t('Опубликован ли материал')?>"><?php t('Опб')?></th>
+			<th class="modyfied"><?php t('Изменен')?></th>
 			<th style="width: 90px;" class="control" title="<?php t('Упраление материалом')?>"></th>
 		</tr>
 	</thead>

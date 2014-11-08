@@ -5,7 +5,7 @@ if( isset( $db_structure) ) $db_structure = & $db_structure;
 
 <div class="structure-element">
     <a class="open"
-       href="<?php url_base('product', $db_structure->id) ?>"
+       href="<?php url_base('product/table', 'db_structure_id', 'company_id') ?>"
        title="Окрыть ветку в новом окне">
         <?php echo $db_structure->Name; ?>
     </a>
@@ -43,29 +43,6 @@ if( isset( $db_structure) ) $db_structure = & $db_structure;
            title="Переместить ЭСС ниже по данной ветке">
         </a>
 
-        <!-- SHOW FIELDS LINK !-->
-        <a class="control fields icon2 icon_16x16 icon-add-field"
-           href="<?php url_base('field/list/',$db_structure->id)?>"
-           title="Управление полями ЭСС">
-        </a>
-
-        <!-- PERMISSIONS LINK !-->
-        <a class="control permissions icon2 icon_16x16 icon-right"
-           href="<?php url_base('permission/ajax_form/',$db_structure->id)?>/0"
-           title="Управление правами для ЭСС">
-        </a>
-
-        <!-- NEW MATERIAL LINK !-->
-        <a class="control add-material icon2 icon_16x16 icon-add-material"
-           href="<?php url_base('material/form/0/', $db_structure->id)?>"
-           title="Добавить материал к данному ЭСС">
-        </a>
-
-        <!-- GO TO MATERIALS LINK !-->
-        <a class="control materials icon2 icon_16x16 icon-material"
-           href="<?php url_base('material/',$db_structure->id)?>"
-           title="Перейти к материалам ЭСС">
-        </a>
     </div>
 </div>
 <div class="clear"></div>

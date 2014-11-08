@@ -32,9 +32,9 @@ class ProductApplication extends \samson\cms\App
 	/** Controllers */
 	
 	/** Generic controller */
-	public function __handler($cmsnav = null, $search = null, $page = null)
+	public function __handler($cmsnav = null, $company = 0, $search = 'no-search', $page = null)
 	{
-        $catalog = dbQuery('\samson\cms\web\navigation\CMSNav')->Url('catalog')->first();
+        $catalog = dbQuery('\samson\cms\web\navigation\CMSNav')->Url('katalog')->first();
         // Generate localized title
         $title = t($this->app_name, true);
 
@@ -61,9 +61,10 @@ class ProductApplication extends \samson\cms\App
 		// Set view data
 		$this
             ->title($title)
-			->search($search)
+            ->company_id(0)
+            ->cmsnav_id(4)
             ->tree(\samson\cms\web\navigation\CMSNav::fullTree($catalog))
-			->set($this->__async_table($cmsnav, $search, $page))
+			->set($this->__async_table($cmsnav, $company, $search, $page))
 		;
 	}
 
@@ -75,15 +76,17 @@ class ProductApplication extends \samson\cms\App
 	 * @param string $page		Current table page	 
 	 * @return array Collection of rendered table and pager data
 	 */
-	function __async_table($cmsnav = null, $search = null, $page = null)
+	function __async_table($cmsnav = null, $company = null, $search = null, $page = null)
 	{
 		// Try to find cmsnav
-        if (isset($cmsnav) && (is_object($cmsnav) || dbQuery('\samson\cms\Navigation')->id($cmsnav)->first($cmsnav))) {
+        if (isset($cmsnav) && (is_object($cmsnav) || dbQuery('\samson\cms\web\navigation\CMSNav')->id($cmsnav)->first($cmsnav))) {
             // Handle successfull found
+        } else {
+            $cmsnav = dbQuery('\samson\cms\web\navigation\CMSNav')->Url('katalog')->first();
         }
 		
 		// Generate materials table		
-		$table = new Table($cmsnav, $search, $page);
+		$table = new Table($cmsnav, $company, $search, $page);
 
         // Add aditional material fields
         $ocg = new dbConditionGroup('OR');
@@ -99,6 +102,7 @@ class ProductApplication extends \samson\cms\App
             $ocg->arguments[] = $cg;
         }
 
+        //m()->company_id($company);
         // Add condition group
         $table->search_fields[] = $ocg;
 
@@ -155,31 +159,7 @@ class ProductApplication extends \samson\cms\App
 		// Return error array
 		else return array( 'status' => FALSE, 'message' => 'Material "'.$_cmsmat.'" not found');
 	}
-	
-// 	/**
-// 	 * Copy material
-// 	 * @param mixed $_cmsmat Pointer to material object or material identifier
-// 	 * @return array Operation result data
-// 	 */
-// 	function __async_copy( $_cmsmat )
-// 	{
-// 		return array( 'status' => FALSE, 'message' => 'Material "'.$_cmsmat.'" not found');
-		
-// 		// Get material safely 
-// 		if( cmsquery()->id($_cmsmat)->first( $cmsmat ) )
-// 		{
-// 			// Toggle material published status
-// 			$cmsmat->Published = $cmsmat->Published ? 0 : 1;
-			
-// 			// Save changes to DB
-// 			$cmsmat->save();
-			
-// 			// Действие не выполнено
-// 			return array( 'status' => TRUE );
-// 		}		
-// 		// Return error array
-// 		else return array( 'status' => FALSE, 'message' => 'Material "'.$_cmsmat.'" not found');
-// 	}
+
 	
 	/** Output for main page */
 	public function main()

@@ -30,6 +30,10 @@ class Table extends \samson\cms\table\Table
 	
 	/** Array of drafts with out materials */
 	protected $single_drafts = array();
+
+    protected $companies = array();
+
+    protected $categories = array();
 	
 	/** Search material fields */
 	public $search_fields = array( 'Name', 'Url'  );	
@@ -54,7 +58,7 @@ class Table extends \samson\cms\table\Table
 	{
 		// If keywords has chars
 		if ( isset( $keywords{0} ) )
-		{			
+		{
 			// Create condition group
 			$scg = new Condition('or');
 
@@ -104,7 +108,7 @@ class Table extends \samson\cms\table\Table
 	 * @param string $search	Keywords to search in materials
 	 * @param string $page		Current table page number
 	 */
-	public function __construct( Navigation & $nav = null, $search = null, $page = null )
+	public function __construct( Navigation & $nav = null, $companyID = 0, $search = null, $page = null )
 	{			
 		// Save parent cmsnav
 		$this->nav = & $nav;
@@ -113,13 +117,20 @@ class Table extends \samson\cms\table\Table
 		$this->search = $search;
 		
 		// Generate pager url prefix
-		$prefix = 'material/table/'.(isset($nav) ? $nav->id : '0').'/'.(isset($search{0}) ? $search : 'no-search').'/';
+		$prefix = 'product/table/'.(isset($nav) ? $nav->id : '0').'/'.(isset($companyID) ? $companyID : '0').'/'.(isset($search{0}) ? $search : 'no-search').'/';
 		
 		// Create pager
 		$this->pager = new \samson\pager\Pager( $page, self::ROWS_COUNT, $prefix );		
 
 		// Create DB query object
-		$this->query = dbQuery('samson\cms\cmsmaterial')
+		$this->query = dbQuery('samson\cms\cmsmaterial');
+
+        if ($companyID != 0) {
+            $this->query->cond('company_id', $companyID);
+        } else {
+            $this->query->cond('company_id', 0, dbRelation::NOT_EQUAL);
+        }
+        $this->query
             ->parent_id(0)
 			->Draft(0)
 			->Active(1)
@@ -138,13 +149,13 @@ class Table extends \samson\cms\table\Table
         }*/
 
 		// Perform query by cmsnavmaterial and get material ids
-		if( isset($nav) && dbQuery('samson\cms\cmsnavmaterial')->StructureID( $nav->id )->Active( 1 )->fields('MaterialID', $ids))
+		if( isset($nav) && dbQuery('samson\cms\CMSNavMaterial')->StructureID( $nav->id )->Active( 1 )->fields('MaterialID', $ids))
 		{
 			// Set corresponding material ids related to specified cmsnav
 			$this->query->id($ids);				
-		}			
-			
-		// Call parent constructor
+		}
+
+        // Call parent constructor
 		parent::__construct( $this->query, $this->pager );
 	}
 	
@@ -209,7 +220,14 @@ class Table extends \samson\cms\table\Table
 		m()->view(  $this->row_tmpl );
 		
 		// If there is cmsnav for material pass them
-		if( isset( $db_material->onetomany['_structure'] )) m()->navs( $db_material->onetomany['_structure'] ); 
+		if( isset( $db_material->onetomany['_structure'] )) {
+            foreach ($db_material->onetomany['_structure'] as $nav) {
+                if ($nav->Url == $db_material->category) {
+                    m()->cmsnav($nav);
+                    break;
+                }
+            }
+        }
 		
 		// If there is a draft for this material, pass draft to view
 		if( isset( $drafts[ $db_material->id ] )) m()->draft( $this->drafts[ $db_material->id ] ); 	
@@ -217,6 +235,7 @@ class Table extends \samson\cms\table\Table
 		// Render row template
 		return m()						
 			->cmsmaterial( $db_material )
+            ->company(dbQuery('material')->id($db_material->company_id)->first())
 			->user( isset($db_material->onetoone['_user']) ? $db_material->onetoone['_user'] : '' )			
 			->pager( $this->pager )
 			->nav_id( isset($this->nav) ? $this->nav->id : '0' )	
