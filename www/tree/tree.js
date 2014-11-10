@@ -4,37 +4,53 @@
 
 var searchField = s('input#search');
 var searchInitiated = false;
-
+var loader = new Loader(s('#content'));
 // Ajax request handle
 var searchRequest;
 var searchTimeout;
 
 function  AppProductInit(response){
     if (response !== undefined) {
-        s('.products_table').html(response.table_html);
-        s('.table-pager').html(response.pager_html);
+        if (response.table_html !== undefined) {
+            s('.products_table').html(response.table_html);
+        }
+
+        if (response.pager_html !== undefined) {
+            s('.table-pager').html(response.pager_html);
+        }
+
+        if (response.tree !== undefined) {
+            s('.products_tree').html(response.tree);
+
+        }
     }
+    s('.products-table').fixedHeader();
     AppProductInitTableButtons(s('.products_table'));
     AppProductInitPagerButtons(s('.table-pager'));
 }
 
 s('.products_tree').pageInit(function(obj) {
     AppProductInit();
+    AppProductInitTree();
     AppProductSearch(s('.products_table'));
 
-    obj.treeview();
-    s('.collapsable', obj).each(function(el) {
-        el.addClass('collapsed');
-    });
-    s('.open', obj).ajaxClick(function(response) {
-        AppProductInit(response);
-    });
 });
 
 function AppProductInitTableButtons(table) {
-    s('.brand_link', table).each(function (link) {
+    /*s('.brand_link', table).each(function (link) {
         link.ajaxClick(function (response) {
             AppProductInit(response);
+        });
+    });*/
+
+    s('.product_delete', table).each(function(link) {
+        link.ajaxClick(function (response) {
+            loader.hide();
+            AppProductInit(response);
+        }, function() {
+            // Create generic loader
+            loader.show('Подождите', true);
+            return true;
         });
     });
 }
@@ -43,7 +59,12 @@ function AppProductInitPagerButtons(pager)
 {
     s('a', pager).each(function (link) {
         link.ajaxClick(function (response) {
+            loader.hide();
             AppProductInit(response);
+        }, function() {
+            // Create generic loader
+            loader.show('Подождите', true);
+            return true;
         });
     });
 }
@@ -87,9 +108,6 @@ function AppProductSearch(table) {
                     // Set flag
                     searchInitiated = true;
 
-                    // Create generic loader
-                    var loader = new Loader(table);
-
                     // Show loader with i18n text and black bg
                     loader.show(s('.loader-text').val(), true);
 
@@ -108,6 +126,132 @@ function AppProductSearch(table) {
                 }
 
             }, 1000);
+        }
+    });
+}
+
+function AppProductInitTree(tree)
+{
+    tree.treeview();
+    s('.collapsable', tree).each(function(el) {
+        el.addClass('collapsed');
+    });
+    s('.open', tree).ajaxClick(function(response) {
+        loader.hide();
+        AppProductInit(response);
+    }, function() {
+        // Create generic loader
+        loader.show('Подождите', true);
+        return true;
+    });
+
+    s('.product_control.material_move', tree).click(function(link) {
+        var selectForm = s(".table_form");
+        var selectAction = 'product/move/' + link.a('structure');
+        selectForm.ajaxForm({
+            'url': selectAction,
+            'handler': function(respTxt){
+                respTxt = JSON.parse(respTxt);
+                AppProductInit(respTxt);
+            }
+        });
+
+        return false;
+    });
+
+    s(".product_control.add", tree).tinyboxAjax({
+        html:'html',
+        renderedHandler: function(response, tb) {
+            /** автоматический транслит Урл*/
+            s("#Name").keyup(function(obj) {
+                s("#Url").val(s("#Name").translit());
+            });
+            /** транслит по кнопке */
+            s("#generateUrl").click(function(obj) {
+                if (confirm("Вы точно хотите сгенерировать адрес?")) {
+                    s("#Url").val(s("#Name").translit());
+                }
+            });
+
+            s('.structure_submit_button').click(function(link) {
+                var selectForm = s(".form2");
+                var selectAction = 'product/structureupdate/' + link.a('structure');
+                selectForm.ajaxForm({
+                    'url': selectAction,
+                    'handler': function(respTxt){
+                        respTxt = JSON.parse(respTxt);
+                        AppProductInit(respTxt);
+                        tb.close();
+                    }
+                });
+
+                return false;
+            });
+
+            s(".cancel-button").click(function() {
+                tb.close();
+            });
+
+        },
+        beforeHandler: function() {
+            loader.show('Загрузка формы', true);
+            return true;
+        },
+        responseHandler: function() {
+            loader.hide();
+            return true;
+        }
+    });
+    /**
+     * обработчик редактирование новой записи
+     */
+    s(".product_control.editstr", tree).tinyboxAjax({
+        html:'html',
+        renderedHandler: function(response, tb) {
+            s("#generateUrl").click(function(obj) {
+                if (confirm("Вы точно хотите сгенерировать адрес?")) {
+                    s("#Url").val(s("#Name").translit());
+                }
+            });
+
+            s('.structure_submit_button').click(function(link) {
+                var selectForm = s(".form2");
+                var selectAction = 'product/structureupdate/' + link.a('structure');
+                selectForm.ajaxForm({
+                    'url': selectAction,
+                    'handler': function(respTxt){
+                        respTxt = JSON.parse(respTxt);
+                        AppProductInit(respTxt);
+                        tb.close();
+                    }
+                });
+
+                return false;
+            });
+
+            s(".cancel-button").click(function() {
+                tb.close();
+            });
+        },
+        beforeHandler: function() {
+            loader.show('Загрузка формы', true);
+            return true;
+        },
+        responseHandler: function() {
+            loader.hide();
+            return true;
+        }
+    });
+
+    s(".product_control.delete").ajaxClick(function(response) {
+        s(".products_tree").html(response.tree).treeview();
+        loader.hide();
+    }, function() {
+        if (confirm("Вы уверены, что хотите безвозвратно удалить структуру?")) {
+            loader.show('Удаление структуры', true);
+            return true;
+        } else {
+            return false;
         }
     });
 }

@@ -28,13 +28,15 @@ class ProductApplication extends \samson\cms\App
 	
 	/** Table rows count */
 	protected $table_rows = 15;
+
+    protected $catalogID = 4;
 		
 	/** Controllers */
 	
 	/** Generic controller */
 	public function __handler($cmsnav = null, $company = 0, $search = 'no-search', $page = null)
 	{
-        $catalog = dbQuery('\samson\cms\web\navigation\CMSNav')->Url('katalog')->first();
+        $catalog = dbQuery('\samson\cms\web\navigation\CMSNav')->id($this->catalogID)->first();
         // Generate localized title
         $title = t($this->app_name, true);
 
@@ -62,8 +64,8 @@ class ProductApplication extends \samson\cms\App
 		$this
             ->title($title)
             ->company_id(0)
-            ->cmsnav_id(4)
-            ->tree(\samson\cms\web\navigation\CMSNav::fullTree($catalog))
+            ->cmsnav_id($this->catalogID)
+            //->tree(\samson\cms\web\navigation\CMSNav::fullTree($catalog))
 			->set($this->__async_table($cmsnav, $company, $search, $page))
 		;
 	}
@@ -82,7 +84,7 @@ class ProductApplication extends \samson\cms\App
         if (isset($cmsnav) && (is_object($cmsnav) || dbQuery('\samson\cms\web\navigation\CMSNav')->id($cmsnav)->first($cmsnav))) {
             // Handle successfull found
         } else {
-            $cmsnav = dbQuery('\samson\cms\web\navigation\CMSNav')->Url('katalog')->first();
+            $cmsnav = dbQuery('\samson\cms\web\navigation\CMSNav')->id($this->catalogID)->first();
         }
 		
 		// Generate materials table		
@@ -110,31 +112,10 @@ class ProductApplication extends \samson\cms\App
 
         $pager_html = $table->pager->toHTML();
 
-		// Render table and pager
-		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html);
-	}
+        $tree = \samson\cms\web\navigation\CMSNav::fullTree($cmsnav);
 
-	/**
-	 * Publish/Unpublish material
-	 * @param mixed $_cmsmat Pointer to material object or material identifier 
-	 * @return array Operation result data
-	 */
-	function __async_publish( $_cmsmat )
-	{
-		// Get material safely 
-		if( cmsquery()->id($_cmsmat)->first( $cmsmat ) )
-		{
-			// Toggle material published status
-			$cmsmat->Published = $cmsmat->Published ? 0 : 1;
-			
-			// Save changes to DB
-			$cmsmat->save();
-			
-			// Действие не выполнено
-			return array( 'status' => TRUE );
-		}		
-		// Return error array
-		else return array( 'status' => FALSE, 'message' => 'Material "'.$_cmsmat.'" not found');		
+		// Render table and pager
+		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html, 'tree' => $tree);
 	}
 	
 	/**
@@ -159,6 +140,100 @@ class ProductApplication extends \samson\cms\App
 		// Return error array
 		else return array( 'status' => FALSE, 'message' => 'Material "'.$_cmsmat.'" not found');
 	}
+
+    public function __async_move($structureID)
+    {
+        /** @var \samson\cms\web\navigation\CMSNav $cmsnav */
+        $cmsnav = null;
+        if (isset($_POST['materialIds']) && !empty($_POST['materialIds']) && dbQuery('\samson\cms\web\navigation\CMSNav')->id($structureID)->first($cmsnav)) {
+            if (dbQuery('samson\cms\CMSNavMaterial')->cond('MaterialID', $_POST['materialIds'])->cond('StructureID', 4123, dbRelation::NOT_EQUAL)->exec($data)) {
+                $currentNav = $cmsnav;
+                foreach ($data as $strmat) {
+                    $strmat->delete();
+                }
+
+                foreach ($_POST['materialIds'] as $matID) {
+                    $cmsnav = $currentNav;
+                    $material = dbQuery('material')->id($matID)->first();
+                    $material->category = $cmsnav->Url;
+                    $material->save();
+                    while (isset($cmsnav)) {
+                        $strmat = new \samson\activerecord\structurematerial(false);
+                        $strmat->MaterialID = $matID;
+                        $strmat->StructureID = $cmsnav->id;
+                        $strmat->Active = 1;
+                        $strmat->save();
+                        if ($cmsnav->Url == 'katalog') {
+                            break;
+                        } else {
+                            $cmsnav = $cmsnav->parent();
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this->__async_table($structureID);
+    }
+
+    public function __async_structuredelete($structureID)
+    {
+        /** @var \samson\cms\Navigation $cmsnav */
+        $cmsnav = null;
+        if (dbQuery('\samson\cms\Navigation')->id($structureID)->first($cmsnav)) {
+            foreach ($cmsnav->materials() as $material) {
+                $material->Active = 0;
+                $material->save();
+            }
+
+            $cmsnav->Active = 0;
+            $cmsnav->save();
+        }
+
+        $cmsnav = dbQuery('\samson\cms\web\navigation\CMSNav')->id($this->catalogID)->first();
+
+        return array('status' => 1, 'tree' => \samson\cms\web\navigation\CMSNav::fullTree($cmsnav));
+    }
+
+    public function __async_structureupdate($structureID)
+    {
+        /** @var \samson\cms\web\navigation\CMSNav $data */
+        $data = null;
+
+        $strIds = dbQuery('structure_relation')->cond('child_id', $structureID)->fields('parent_id');
+        if (dbQuery('\samson\cms\web\navigation\CMSNav')->StructureID($structureID)->first($data)) {
+            // Update structure data
+            $data->update();
+
+            $cmsnav = $data;
+
+            foreach ($data->materials() as $material) {
+                $data = $cmsnav;
+                foreach (dbQuery('structurematerial')->cond('MaterialID', $material->id)->cond('StructureID', $strIds)->exec() as $relation) {
+                    $relation->delete();
+                }
+                while ($data) {
+                    $strMat = new \samson\activerecord\structurematerial(false);
+                    $strMat->Active = 1;
+                    $strMat->StructureID = $data->id;
+                    $strMat->MaterialID = $material->id;
+                    $strMat->save();
+
+                    if ($data->id == $this->catalogID) {
+                        break;
+                    } else {
+                        $data = $data->parent();
+                    }
+                }
+            }
+        } else {
+            // Create new structure
+            $nav = new \samson\cms\web\navigation\CMSNav(false);
+            $nav->fillFields();
+        }
+
+        return $this->__async_table($_POST['ParentID']);
+    }
 
 	
 	/** Output for main page */

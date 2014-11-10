@@ -37,7 +37,7 @@
 <!-- Content section -->
 <section id="content">
     <div class="products_tree" style="width: 22%; display: inline-block; vertical-align: top;">
-        <?php iv('tree'); ?>
+        <?php v('tree'); ?>
     </div>
     <div class="products_table" style="width: 77%; display: inline-block; vertical-align: top;">
         <?php v('table_html'); ?>
