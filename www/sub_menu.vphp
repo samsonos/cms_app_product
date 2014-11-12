@@ -1,10 +1,10 @@
 <li>
-	<a class="sub_menu_a <?php if(isv('all_materials')):?>active<?php endif?>" href="<?php url_base('material')?>">
+	<a class="sub_menu_a" href="<?php url_base('product')?>">
         <?php t('Все')?>
 	</a>
 </li>
 <li>
-	<a class="sub_menu_a <?php if(isv('new_material')):?>active<?php endif?>" href="<?php url_base( 'material/form',0,'4');?>">
+	<a class="sub_menu_a" href="<?php url_base('material/form', 0, '4'); ?>">
 		<span class="icon icon_add">.</span><?php t('Новый товар')?>
 	</a>
 </li>

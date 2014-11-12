@@ -30,13 +30,16 @@ class ProductApplication extends \samson\cms\App
 	protected $table_rows = 15;
 
     protected $catalogID = 4;
+
+    protected $brandField = 'company_id';
 		
 	/** Controllers */
 	
 	/** Generic controller */
 	public function __handler($cmsnav = null, $company = 0, $search = 'no-search', $page = null)
 	{
-        $catalog = dbQuery('\samson\cms\web\navigation\CMSNav')->id($this->catalogID)->first();
+        $catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
+
         // Generate localized title
         $title = t($this->app_name, true);
 
@@ -52,20 +55,21 @@ class ProductApplication extends \samson\cms\App
             $this->cmsnav($cmsnav);
         }
 
-        //trace($cmsnav);
-		
 		// Old-fashioned direct search input form POST if not passed
         $search = !isset($search) ? (isset($_POST['search']) ? $_POST['search'] : '') : $search;
 
         if (!isset($cmsnav)) {
             m()->all_materials(true);
         }
+
+        m()->company_id($company);
+        $tree = new \samson\cms\treeview\CMSTree('tree/tree-template', 0, 'product/addchildren');
+
 		// Set view data
 		$this
             ->title($title)
-            ->company_id(0)
             ->cmsnav_id($this->catalogID)
-            //->tree(\samson\cms\web\navigation\CMSNav::fullTree($catalog))
+            ->tree($tree->htmlTree($catalog))
 			->set($this->__async_table($cmsnav, $company, $search, $page))
 		;
 	}
@@ -112,10 +116,8 @@ class ProductApplication extends \samson\cms\App
 
         $pager_html = $table->pager->toHTML();
 
-        $tree = \samson\cms\web\navigation\CMSNav::fullTree($cmsnav);
-
 		// Render table and pager
-		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html, 'tree' => $tree);
+		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html);
 	}
 	
 	/**
@@ -145,7 +147,8 @@ class ProductApplication extends \samson\cms\App
     {
         /** @var \samson\cms\web\navigation\CMSNav $cmsnav */
         $cmsnav = null;
-        if (isset($_POST['materialIds']) && !empty($_POST['materialIds']) && dbQuery('\samson\cms\web\navigation\CMSNav')->id($structureID)->first($cmsnav)) {
+        
+        if (isset($_POST['materialIds']) && !empty($_POST['materialIds']) && dbQuery('\samson\cms\Navigation')->id($structureID)->first($cmsnav)) {
             if (dbQuery('samson\cms\CMSNavMaterial')->cond('MaterialID', $_POST['materialIds'])->cond('StructureID', 4123, dbRelation::NOT_EQUAL)->exec($data)) {
                 $currentNav = $cmsnav;
                 foreach ($data as $strmat) {
@@ -190,9 +193,11 @@ class ProductApplication extends \samson\cms\App
             $cmsnav->save();
         }
 
-        $cmsnav = dbQuery('\samson\cms\web\navigation\CMSNav')->id($this->catalogID)->first();
+        $tree = new \samson\cms\treeview\CMSTree('tree/tree-template', 0, 'product/addchildren');
 
-        return array('status' => 1, 'tree' => \samson\cms\web\navigation\CMSNav::fullTree($cmsnav));
+        $catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
+
+        return array('status' => 1, 'tree' => $tree->htmlTree($catalog));
     }
 
     public function __async_structureupdate($structureID)
@@ -258,4 +263,14 @@ class ProductApplication extends \samson\cms\App
 			return $this->rows( $rows_html )->output('main/index');
 		}		
 	}
+
+    public function __async_addchildren($structure_id)
+    {
+        if (dbQuery('\samson\cms\Navigation')->StructureID($structure_id)->first($db_structure)) {
+            $tree = new \samson\cms\treeview\CMSTree('tree/tree-template', 0, 'product/addchildren');
+            return array('status' => 1, 'tree' => $tree->htmlTree($db_structure));
+        }
+
+        return array('status' => 0);
+    }
 }

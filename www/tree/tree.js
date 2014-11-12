@@ -21,7 +21,7 @@ function  AppProductInit(response){
 
         if (response.tree !== undefined) {
             s('.products_tree').html(response.tree);
-
+            AppProductInitTree(s('.products_tree'));
         }
     }
     s('.products-table').fixedHeader();
@@ -31,7 +31,7 @@ function  AppProductInit(response){
 
 s('.products_tree').pageInit(function(obj) {
     AppProductInit();
-    AppProductInitTree();
+    AppProductInitTree(obj);
     AppProductSearch(s('.products_table'));
 
 });
@@ -81,6 +81,9 @@ function AppProductSearch(table) {
     var company = 0;
     if (s('#cmsnav_id').length) {
         cmsnav = s('#cmsnav_id').val();
+    }
+    if (s('#company_id').length) {
+        company = s('#company_id').val();
     }
     var page = 1;
 
@@ -132,10 +135,13 @@ function AppProductSearch(table) {
 
 function AppProductInitTree(tree)
 {
-    tree.treeview();
-    s('.collapsable', tree).each(function(el) {
-        el.addClass('collapsed');
-    });
+    tree.treeview(
+        true,
+        function(tree) {
+            AppProductInitTree(tree);
+        }
+    );
+
     s('.open', tree).ajaxClick(function(response) {
         loader.hide();
         AppProductInit(response);
@@ -148,6 +154,7 @@ function AppProductInitTree(tree)
     s('.product_control.material_move', tree).click(function(link) {
         var selectForm = s(".table_form");
         var selectAction = 'product/move/' + link.a('structure');
+        s.trace(selectAction);
         selectForm.ajaxForm({
             'url': selectAction,
             'handler': function(respTxt){
@@ -244,7 +251,13 @@ function AppProductInitTree(tree)
     });
 
     s(".product_control.delete").ajaxClick(function(response) {
-        s(".products_tree").html(response.tree).treeview();
+        s(".products_tree").html(response.tree);
+        s(".products_tree").treeview(
+            true,
+            function(tree) {
+                AppProductInitTree(tree);
+            }
+        );
         loader.hide();
     }, function() {
         if (confirm("Вы уверены, что хотите безвозвратно удалить структуру?")) {
