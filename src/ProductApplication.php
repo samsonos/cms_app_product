@@ -115,7 +115,7 @@ class ProductApplication extends \samson\cms\App
 
         $catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
 
-        $tree = new \samson\cms\treeview\CMSTree('tree/tree-template', 0, 'product/addchildren');
+        $tree = new \samson\treeview\SamsonTree('tree/tree-template', 0, 'product/addchildren');
 
 		// Render table and pager
 		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html, 'tree' => $tree->htmlTree($catalog));
@@ -194,7 +194,7 @@ class ProductApplication extends \samson\cms\App
             $cmsnav->save();
         }
 
-        $tree = new \samson\cms\treeview\CMSTree('tree/tree-template', 0, 'product/addchildren');
+        $tree = new \samson\treeview\SamsonTree('tree/tree-template', 0, 'product/addchildren');
 
         $catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
 
@@ -268,7 +268,7 @@ class ProductApplication extends \samson\cms\App
     public function __async_addchildren($structure_id)
     {
         if (dbQuery('\samson\cms\Navigation')->StructureID($structure_id)->first($db_structure)) {
-            $tree = new \samson\cms\treeview\CMSTree('tree/tree-template', 0, 'product/addchildren');
+            $tree = new \samson\treeview\SamsonTree('tree/tree-template', 0, 'product/addchildren');
             return array('status' => 1, 'tree' => $tree->htmlTree($db_structure));
         }
 
