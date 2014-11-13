@@ -38,8 +38,6 @@ class ProductApplication extends \samson\cms\App
 	/** Generic controller */
 	public function __handler($cmsnav = null, $company = 0, $search = 'no-search', $page = null)
 	{
-        $catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
-
         // Generate localized title
         $title = t($this->app_name, true);
 
@@ -63,13 +61,12 @@ class ProductApplication extends \samson\cms\App
         }
 
         m()->company_id($company);
-        $tree = new \samson\cms\treeview\CMSTree('tree/tree-template', 0, 'product/addchildren');
+
 
 		// Set view data
 		$this
             ->title($title)
             ->cmsnav_id($this->catalogID)
-            ->tree($tree->htmlTree($catalog))
 			->set($this->__async_table($cmsnav, $company, $search, $page))
 		;
 	}
@@ -116,8 +113,12 @@ class ProductApplication extends \samson\cms\App
 
         $pager_html = $table->pager->toHTML();
 
+        $catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
+
+        $tree = new \samson\cms\treeview\CMSTree('tree/tree-template', 0, 'product/addchildren');
+
 		// Render table and pager
-		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html);
+		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html, 'tree' => $tree->htmlTree($catalog));
 	}
 	
 	/**
@@ -147,7 +148,7 @@ class ProductApplication extends \samson\cms\App
     {
         /** @var \samson\cms\web\navigation\CMSNav $cmsnav */
         $cmsnav = null;
-        
+
         if (isset($_POST['materialIds']) && !empty($_POST['materialIds']) && dbQuery('\samson\cms\Navigation')->id($structureID)->first($cmsnav)) {
             if (dbQuery('samson\cms\CMSNavMaterial')->cond('MaterialID', $_POST['materialIds'])->cond('StructureID', 4123, dbRelation::NOT_EQUAL)->exec($data)) {
                 $currentNav = $cmsnav;
@@ -200,7 +201,7 @@ class ProductApplication extends \samson\cms\App
         return array('status' => 1, 'tree' => $tree->htmlTree($catalog));
     }
 
-    public function __async_structureupdate($structureID)
+    public function __async_structureupdate($structureID = null)
     {
         /** @var \samson\cms\web\navigation\CMSNav $data */
         $data = null;

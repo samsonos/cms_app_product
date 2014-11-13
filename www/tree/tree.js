@@ -18,11 +18,6 @@ function  AppProductInit(response){
         if (response.pager_html !== undefined) {
             s('.table-pager').html(response.pager_html);
         }
-
-        if (response.tree !== undefined) {
-            s('.products_tree').html(response.tree);
-            AppProductInitTree(s('.products_tree'));
-        }
     }
     s('.products-table').fixedHeader();
     AppProductInitTableButtons(s('.products_table'));
@@ -154,7 +149,7 @@ function AppProductInitTree(tree)
     s('.product_control.material_move', tree).click(function(link) {
         var selectForm = s(".table_form");
         var selectAction = 'product/move/' + link.a('structure');
-        s.trace(selectAction);
+
         selectForm.ajaxForm({
             'url': selectAction,
             'handler': function(respTxt){
@@ -187,6 +182,10 @@ function AppProductInitTree(tree)
                     'url': selectAction,
                     'handler': function(respTxt){
                         respTxt = JSON.parse(respTxt);
+                        if (respTxt.tree !== undefined) {
+                            s('.products_tree').html(respTxt.tree);
+                            AppProductInitTree(s('.products_tree'));
+                        }
                         AppProductInit(respTxt);
                         tb.close();
                     }
@@ -228,6 +227,10 @@ function AppProductInitTree(tree)
                     'url': selectAction,
                     'handler': function(respTxt){
                         respTxt = JSON.parse(respTxt);
+                        if (respTxt.tree !== undefined) {
+                            s('.products_tree').html(respTxt.tree);
+                            AppProductInitTree(s('.products_tree'));
+                        }
                         AppProductInit(respTxt);
                         tb.close();
                     }
