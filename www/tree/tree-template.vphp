@@ -5,7 +5,7 @@ if( isset( $db_structure) ) $db_structure = & $db_structure;
 
 <div class="structure-element">
     <a class="open"
-       href="<?php url_base('product/table', 'db_structure_id', 'company_id') ?>"
+       href="<?php url_base('product/table', 'db_structure_id') ?>"
        title="Окрыть ветку в новом окне">
         <?php echo $db_structure->Name; ?>
     </a>

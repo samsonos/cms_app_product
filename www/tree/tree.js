@@ -137,13 +137,17 @@ function AppProductInitTree(tree)
         }
     );
 
-    s('.open', tree).ajaxClick(function(response) {
-        loader.hide();
-        AppProductInit(response);
-    }, function() {
-        // Create generic loader
-        loader.show('Подождите', true);
-        return true;
+    s('.open', tree).each(function(link) {
+        link.href = link.a('href') + '/' + s('#company_id').val();
+        link.a('href', link.href);
+        link.ajaxClick(function(response) {
+            loader.hide();
+            AppProductInit(response);
+        }, function() {
+            // Create generic loader
+            loader.show('Подождите', true);
+            return true;
+        });
     });
 
     s('.product_control.material_move', tree).click(function(link) {
