@@ -48,10 +48,12 @@ class ProductApplication extends \samson\cms\App
 		if (isset($cmsnav) && dbQuery('\samson\cms\Navigation')->id($cmsnav)->first($cmsnav)) {
             // Add structure title
             $title = t($cmsnav->Name, true).' - '.$title;
-
-            // Pass Navigation to view
-            $this->cmsnav($cmsnav);
+        } else {
+            $cmsnav = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
         }
+
+        // Pass Navigation to view
+        $this->cmsnav($cmsnav);
 
 		// Old-fashioned direct search input form POST if not passed
         $search = !isset($search) ? (isset($_POST['search']) ? $_POST['search'] : '') : $search;

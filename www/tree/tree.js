@@ -141,6 +141,7 @@ function AppProductInitTree(tree)
         link.href = link.a('href') + '/' + s('#company_id').val();
         link.a('href', link.href);
         link.ajaxClick(function(response) {
+            s('.icon-structure').html(link.html());
             loader.hide();
             AppProductInit(response);
         }, function() {
