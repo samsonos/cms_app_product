@@ -58,10 +58,6 @@ class ProductApplication extends \samson\cms\App
 		// Old-fashioned direct search input form POST if not passed
         $search = !isset($search) ? (isset($_POST['search']) ? $_POST['search'] : '') : $search;
 
-        if (!isset($cmsnav)) {
-            m()->all_materials(true);
-        }
-
         m()->company_id($company);
 
 
@@ -84,10 +80,10 @@ class ProductApplication extends \samson\cms\App
 	function __async_table($cmsnav = null, $company = null, $search = null, $page = null)
 	{
 		// Try to find cmsnav
-        if (isset($cmsnav) && (is_object($cmsnav) || dbQuery('\samson\cms\web\navigation\CMSNav')->id($cmsnav)->first($cmsnav))) {
+        if (isset($cmsnav) && (is_object($cmsnav) || dbQuery('\samson\cms\Navigation')->id($cmsnav)->first($cmsnav))) {
             // Handle successfull found
         } else {
-            $cmsnav = dbQuery('\samson\cms\web\navigation\CMSNav')->id($this->catalogID)->first();
+            $cmsnav = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
         }
 		
 		// Generate materials table		
@@ -264,7 +260,7 @@ class ProductApplication extends \samson\cms\App
 			
 			// Render main template
 			return $this->rows( $rows_html )->output('main/index');
-		}		
+		}
 	}
 
     public function __async_addchildren($structure_id)

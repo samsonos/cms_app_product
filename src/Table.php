@@ -104,7 +104,7 @@ class Table extends \samson\cms\table\Table
 	
 	/**
 	 * Constructor 
-	 * @param CMSNav $nav 		Parent CMSNav to filter materials
+	 * @param Navigation $nav 		Parent CMSNav to filter materials
 	 * @param string $search	Keywords to search in materials
 	 * @param string $page		Current table page number
 	 */
@@ -136,6 +136,7 @@ class Table extends \samson\cms\table\Table
 			->Active(1)
 			->own_order_by('Modyfied', 'DESC')
 			->join('user')
+            ->join('productcompany')
 			->join('structurematerial')
 			->join('samson\cms\Navigation')
 		;				
@@ -215,7 +216,7 @@ class Table extends \samson\cms\table\Table
 	
 	/** @see \samson\cms\table\Table::row() */
 	public function row( & $db_material, Pager & $pager = null )
-	{			
+	{
 		// Set table row view context
 		m()->view(  $this->row_tmpl );
 		
@@ -235,7 +236,7 @@ class Table extends \samson\cms\table\Table
 		// Render row template
 		return m()						
 			->cmsmaterial( $db_material )
-            ->company(dbQuery('material')->id($db_material->company_id)->first())
+            ->company(isset($db_material->onetoone['_productcompany']) ? $db_material->onetoone['_productcompany'] : '')
 			->user( isset($db_material->onetoone['_user']) ? $db_material->onetoone['_user'] : '' )			
 			->pager( $this->pager )
 			->nav_id( isset($this->nav) ? $this->nav->id : '0' )	

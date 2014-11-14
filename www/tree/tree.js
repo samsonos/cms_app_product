@@ -142,6 +142,8 @@ function AppProductInitTree(tree)
         link.a('href', link.href);
         link.ajaxClick(function(response) {
             s('.icon-structure').html(link.html());
+            s('.open').removeClass('current');
+            link.addClass('current');
             loader.hide();
             AppProductInit(response);
         }, function() {
