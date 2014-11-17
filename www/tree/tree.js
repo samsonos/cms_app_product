@@ -26,7 +26,11 @@ function  AppProductInit(response){
 
 s('.products_tree').pageInit(function(obj) {
     AppProductInit();
+
+    s('ul', obj).addClass('tree-root');
+
     AppProductInitTree(obj);
+
     AppProductSearch(s('.products_table'));
 
 });
@@ -136,6 +140,59 @@ function AppProductInitTree(tree)
             AppProductInitTree(tree);
         }
     );
+
+    var parentID;
+    var childID;
+    var parentName;
+    var moveFlag = false;
+
+    if (!tree.hasClass('sjs-treeview')) {
+        tree = s('.sjs-treeview', tree);
+    }
+
+    $(tree.DOMElement).not('.tree-root').find('.collapsed').each(function() {
+        $(this).draggable({
+            revert : true,
+            start : function() {
+                moveFlag = false;
+                s('.current-tree').removeClass('current-tree');
+                $(this).parent().addClass('current-tree');
+                $(".sjs-treeview:not(.current-tree, .tree-root)").droppable({
+                    drop : function(event, ui) {
+                        if (!$(this).hasClass('current-tree')) {
+                            parentName = $(this).parent().find('a').first().text();
+                            if (confirm('Вы уверены, что хотите переместить выбранную структуру в категорию ' + parentName.trim() + '?')) {
+                                $(this).find('.last').removeClass('last').addClass('notlast');
+                                $(this).append(ui.draggable);
+                                ui.draggable.removeClass('notlast').addClass('last');
+                                parentID = $(this).parent().find('.structure_id').first().text();
+                                moveFlag = true;
+                            }
+                        }
+                    },
+                    activate : function() {
+                        //s.trace(12345);
+                        //$('.drag_here').show();
+                    },
+                    deactivate : function() {
+                        //s.trace(123456);
+                        //$('.drag_here').hide();
+                    }
+                });
+            },
+            stop : function() {
+                if (moveFlag) {
+                    loader.show('Перемещаю структуру', true);
+                    childID = $(this).find('.structure_id').first().text();
+                    s.trace('product/movestructure/' + childID + '/' + parentID);
+
+                    s.ajax('product/movestructure/' + childID + '/' + parentID, function(response) {
+                        loader.hide();
+                    });
+                }
+            }
+        });
+    });
 
     s('.open', tree).each(function(link) {
         link.href = link.a('href') + '/' + s('#company_id').val();

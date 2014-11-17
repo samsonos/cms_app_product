@@ -239,6 +239,85 @@ class ProductApplication extends \samson\cms\App
         return $this->__async_table($_POST['ParentID']);
     }
 
+    public function __async_movestructure($childID, $parentID)
+    {
+        $child = dbQuery('\samson\cms\Navigation')->id($childID)->first();
+        $strIds = array();
+        $cmsnav = $child->parent();
+        while ($cmsnav) {
+            $strIds[] = $cmsnav->id;
+            if ($cmsnav->id == $this->catalogID) {
+                break;
+            }
+            $cmsnav = $cmsnav->parent();
+        }
+
+        if (dbQuery('structure_relation')->cond('child_id', $childID)->exec($strRelations)) {
+            foreach ($strRelations as $strRelation) {
+                $strRelation->delete();
+            }
+        }
+
+        // Create new relation with new parent
+        $strRelation = new \samson\activerecord\structure_relation(false);
+        $strRelation->child_id = $childID;
+        $strRelation->parent_id = $parentID;
+        $strRelation->save();
+
+
+        // Create array of structure ids which we need to use to create structurematerial relations
+        $relIds = array($parentID);
+        // Get relations of new parent
+        $stRel = dbQuery('structure_relation')->child_id($parentID)->exec();
+        while ($stRel) {
+            // Save ids for loop query
+            $ids = array();
+            // Break flag
+            $break = false;
+            foreach ($stRel as $strR) {
+                // Save current relation id
+                $ids[] = $strR->id;
+
+                // Save parent
+                $relIds[] = $strR->parent_id;
+                if ($strR->parent_id == $this->catalogID) {
+                    $break = true;
+                    break;
+                }
+            }
+            if ($break) {
+                break;
+            } else {
+                // Get next relations
+                $stRel = dbQuery('structure_relation')->id($ids)->exec();
+            }
+        }
+
+        // Get materials of current category
+        if (\samson\cms\CMS::getMaterialsByStructures($childID, $materials)) {
+            // Create new structurematerial relations
+            foreach ($materials as $material) {
+
+                // Delete old structurematerial relations
+                foreach (dbQuery('structurematerial')->cond('MaterialID', $material->id)->cond('StructureID', $strIds)->exec() as $relation) {
+                    $relation->delete();
+                }
+
+                // Create new relations
+                foreach ($relIds as $relId) {
+                    $strMat = new \samson\activerecord\structurematerial(false);
+                    $strMat->Active = 1;
+                    $strMat->StructureID = $relId;
+                    $strMat->MaterialID = $material->id;
+                    $strMat->save();
+                }
+            }
+        }
+
+
+        return array('status' => 1);
+    }
+
 	
 	/** Output for main page */
 	public function main()
