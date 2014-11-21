@@ -289,7 +289,7 @@ class ProductApplication extends \samson\cms\App
                 break;
             } else {
                 // Get next relations
-                $stRel = dbQuery('structure_relation')->id($ids)->exec();
+                $stRel = dbQuery('structure_relation')->child_id($relIds)->exec();
             }
         }
 
