@@ -314,33 +314,8 @@ class ProductApplication extends \samson\cms\App
             }
         }
 
-
         return array('status' => 1);
     }
-
-	
-	/** Output for main page */
-	public function main()
-	{			
-		// Получим все материалы
-		if( dbQuery('samson\cms\cmsmaterial')->join('user')->Active(1)->Draft(0)->order_by('Created','DESC')->limit(5)->exec($db_materials) )
-		{
-			// Render material rows
-			$rows_html = '';
-			foreach ( $db_materials as $db_material ) $rows_html .= $this->view('main/row')
-			->material($db_material)
-			->user($db_material->onetoone['_user'])			
-			->output();		
-
-			for ($i = sizeof($db_materials); $i < 5; $i++) 
-			{
-				$rows_html .= $this->view('main/row')->output();	
-			}
-			
-			// Render main template
-			return $this->rows( $rows_html )->output('main/index');
-		}
-	}
 
     public function __async_addchildren($structure_id)
     {
