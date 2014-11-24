@@ -184,7 +184,6 @@ function AppProductInitTree(tree)
                 if (moveFlag) {
                     loader.show('Перемещаю структуру', true);
                     childID = $(this).find('.structure_id').first().text();
-                    s.trace('product/movestructure/' + childID + '/' + parentID);
 
                     s.ajax('product/movestructure/' + childID + '/' + parentID, function(response) {
                         loader.hide();
