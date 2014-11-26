@@ -1,5 +1,4 @@
-<form class="table_form" method="post">
-    <table id="list" class="table products-table">
+<table id="list" class="table products-table">
 	<thead>
 		<tr>
 			<th class="id">#</th>
@@ -12,8 +11,9 @@
 			<th style="width: 90px;" class="control" title="<?php t('Упраление материалом')?>"></th>
 		</tr>
 	</thead>
-	<tbody>
-        <?php v('rows'); ?>
-    </tbody>
+    <form class="table_form" method="post">
+        <tbody>
+            <?php v('rows'); ?>
+        </tbody>
+    </form>
 </table>
-</form>

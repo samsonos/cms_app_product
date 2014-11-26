@@ -153,7 +153,7 @@ class Table extends \samson\cms\table\Table
 		if( isset($nav) && dbQuery('samson\cms\CMSNavMaterial')->StructureID( $nav->id )->Active( 1 )->fields('MaterialID', $ids))
 		{
 			// Set corresponding material ids related to specified cmsnav
-			$this->query->id($ids);				
+			$this->query->id($ids);
 		}
 
         // Call parent constructor

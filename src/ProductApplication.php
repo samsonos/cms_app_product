@@ -85,7 +85,7 @@ class ProductApplication extends \samson\cms\App
         } else {
             $cmsnav = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
         }
-		
+
 		// Generate materials table		
 		$table = new Table($cmsnav, $company, $search, $page);
 

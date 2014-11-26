@@ -12,7 +12,7 @@
     <?php endif?>
     <input id="cmsnav_id" type="hidden" value="<?php iv('cmsnav_id'); ?>">
     <input id="company_id" type="hidden" value="<?php if (isv('company_id')) { v('company_id'); } else { echo 0; } ?>">
-    <h1 class="icon2 icon_16x16 left icon-material" title="<?php t('Таблица товаров')?>"><?php t('Товары')?>:</h1>
+    <h1 class="icon2 icon_16x16 left icon-material" title="<?php t('Таблица продуктов')?>"><?php t('Продукты')?>:</h1>
     <!-- End of Header block -->
 
     <!-- Table search block -->
@@ -36,10 +36,10 @@
 
 <!-- Content section -->
 <section id="content">
-    <div class="products_tree" style="width: 22%; display: inline-block; vertical-align: top;">
+    <div class="products_tree" style="position: absolute;  width: 22%; bottom: 0; top: 0; left: 10px; overflow-x: hidden; overflow-y: auto;">
         <?php v('tree'); ?>
     </div>
-    <div class="products_table" style="width: 77%; display: inline-block; vertical-align: top;">
+    <div class="products_table" style="position: absolute; width: 77%; bottom: 0; top: 0; right: 0; overflow-x: hidden; overflow-y: auto;">
         <?php v('table_html'); ?>
     </div>
 </section>
