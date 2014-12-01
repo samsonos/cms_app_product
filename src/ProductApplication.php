@@ -242,6 +242,8 @@ class ProductApplication extends \samson\cms\App
     public function __async_movestructure($childID, $parentID)
     {
         $child = dbQuery('\samson\cms\Navigation')->id($childID)->first();
+        $child->ParentID = $parentID;
+        $child->save();
         $strIds = array();
         $cmsnav = $child->parent();
         while ($cmsnav) {
