@@ -74,6 +74,15 @@ class Table extends \samson\cms\web\material\Table
             $this->query->cond('company_id', 0, dbRelation::NOT_EQUAL);
         }
         $this->query->join('productcompany');
+        dbQuery('samson\cms\CMSNavMaterial')
+            ->cond('StructureID', $this->nav->id)
+            ->cond('Active', 1)->fields('MaterialID', $ids);
+
+        if (sizeof($ids)) {
+            $this->query->id($ids);
+        } else {
+            $this->query->id(0);
+        }
     }
 
     public function setPagerPrefix()
