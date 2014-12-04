@@ -36,7 +36,7 @@ class ProductApplication extends \samson\cms\App
 	/** Controllers */
 	
 	/** Generic controller */
-	public function __handler($cmsnav = null, $company = 0, $search = 'no-search', $page = null)
+	public function __handler($cmsnav = null, $company = 0, $search = null, $page = null)
 	{
         // Generate localized title
         $title = t($this->app_name, true);
@@ -89,24 +89,6 @@ class ProductApplication extends \samson\cms\App
 		// Generate materials table		
 		$table = new Table($cmsnav, $company, $search, $page);
 
-        // Add aditional material fields
-        $ocg = new dbConditionGroup('OR');
-        foreach ( cms()->material_fields as $f) {
-            // Create special condition for additional fields
-            $cg = new dbConditionGroup('AND');
-            $cg->arguments[] = new dbConditionArgument('_mf.FieldID', $f->FieldID);
-
-            if (isset($search) && $search != 'no-search') {
-                $cg->arguments[] = new dbConditionArgument('_mf.Value', '%'.$search.'%', dbRelation::LIKE );
-            }
-
-            $ocg->arguments[] = $cg;
-        }
-
-        //m()->company_id($company);
-        // Add condition group
-        $table->search_fields[] = $ocg;
-
         $table_html = $table->render();
 
         $pager_html = $table->pager->toHTML();
@@ -118,7 +100,7 @@ class ProductApplication extends \samson\cms\App
 		// Render table and pager
 		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html, 'tree' => $tree->htmlTree($catalog));
 	}
-	
+
 	/**
 	 * Delete material
 	 * @param mixed $_cmsmat Pointer to material object or material identifier

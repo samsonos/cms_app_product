@@ -66,6 +66,12 @@ class Table extends \samson\cms\web\material\Table
         parent::__construct($nav, $search, $page);
     }
 
+    public function beforeHandler() {
+        parent::beforeHandler();
+
+        $this->query->join('productcompany');
+    }
+
     public function queryHandler()
     {
         if ($this->companyID != 0) {
@@ -89,52 +95,6 @@ class Table extends \samson\cms\web\material\Table
     {
         // Generate pager url prefix
         return 'product/table/'.(isset($this->nav) ? $this->nav->id : '0').'/'.(isset($this->companyID) ? $this->companyID : '0').'/'.(isset($this->search{0}) ? $this->search : 'no-search').'/';
-    }
-
-    /** @see \samson\cms\table\Table::render() */
-    public function render(array $rows = null, $module = null)
-    {
-        // If no rows is passed use generic rows
-        if (!isset($rows)) {
-
-            //db()->debug(false);
-            /** @var \samson\cms\Material[] $materials Get original materials */
-            $materials = array();
-            if ($this->query->exec($materials)) {
-
-                // Get all materials with joined data
-                $materials = dbQuery('\samson\cms\material')
-                    ->id(array_keys($materials)) // Pass all material identifiers
-                    ->join('user')
-                    ->join('structurematerial')
-                    ->join('samson\cms\Navigation')
-                    ->join('productcompany')
-                    ->exec();
-
-                // Generic rendering routine
-                return parent::render($materials);
-            } else { // Query failed
-                // Render empty or not found row content
-                $row = '';
-                if (!isset($this->search{0})) {
-                    $row = $this->emptyrow($this->query, $this->pager);
-                } else { // Not found
-                    $row = m()->output($this->notfound_tmpl);
-                }
-
-                // Manually render table
-                return m()
-                    ->view($this->table_tmpl)
-                    ->set($this->pager)
-                    ->rows($row)
-                    ->output();
-            }
-
-            //db()->debug(false);
-        }
-
-        // Perform table rendering
-        return parent::render($rows);
     }
 
     /** @see \samson\cms\table\Table::row() */
