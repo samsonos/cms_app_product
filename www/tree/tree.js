@@ -224,6 +224,8 @@ function AppProductInitTree(tree)
         return false;
     });
 
+    var parent;
+
     s(".product_control.add", tree).tinyboxAjax({
         html:'html',
         renderedHandler: function(response, tb) {
@@ -246,8 +248,8 @@ function AppProductInitTree(tree)
                     'handler': function(respTxt){
                         respTxt = JSON.parse(respTxt);
                         if (respTxt.tree !== undefined) {
-                            s('.products_tree').html(respTxt.tree);
-                            AppProductInitTree(s('.products_tree'));
+                            parent.html(respTxt.tree);
+                            AppProductInitTree(parent);
                         }
                         AppProductInit(respTxt);
                         tb.close();
@@ -262,7 +264,8 @@ function AppProductInitTree(tree)
             });
 
         },
-        beforeHandler: function() {
+        beforeHandler: function(link) {
+            parent = link.parent(' sjs-treeview');
             loader.show('Загрузка формы', true);
             return true;
         },
@@ -291,8 +294,8 @@ function AppProductInitTree(tree)
                     'handler': function(respTxt){
                         respTxt = JSON.parse(respTxt);
                         if (respTxt.tree !== undefined) {
-                            s('.products_tree').html(respTxt.tree);
-                            AppProductInitTree(s('.products_tree'));
+                            parent.html(respTxt.tree);
+                            AppProductInitTree(parent);
                         }
                         AppProductInit(respTxt);
                         tb.close();
@@ -306,7 +309,8 @@ function AppProductInitTree(tree)
                 tb.close();
             });
         },
-        beforeHandler: function() {
+        beforeHandler: function(link) {
+            parent = link.parent(' sjs-treeview');
             loader.show('Загрузка формы', true);
             return true;
         },
@@ -317,15 +321,16 @@ function AppProductInitTree(tree)
     });
 
     s(".product_control.delete").ajaxClick(function(response) {
-        s(".products_tree").html(response.tree);
-        s(".products_tree").treeview(
+        parent.html(response.tree);
+        parent.treeview(
             true,
             function(tree) {
                 AppProductInitTree(tree);
             }
         );
         loader.hide();
-    }, function() {
+    }, function(link) {
+        parent = link.parent(' sjs-treeview');
         if (confirm("Вы уверены, что хотите безвозвратно удалить структуру?")) {
             loader.show('Удаление структуры', true);
             return true;

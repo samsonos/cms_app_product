@@ -16,7 +16,7 @@ if( isset( $db_structure) ) $db_structure = & $db_structure;
         <!-- ADD LINK !-->
         <a class="product_control add icon2 icon_16x16 icon-add"
            structure = "<?php echo $db_structure->id ?>"
-           href="<?php url_base('structure/form/', $db_structure->id) ?>"
+           href="<?php url_base('structure/form/', $db_structure->id, 0) ?>"
            title="Добавить подчинённый элемент структуры сайта">
         </a>
 

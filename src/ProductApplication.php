@@ -81,9 +81,13 @@ class ProductApplication extends \samson\cms\App
 	{
 		// Try to find cmsnav
         if (isset($cmsnav) && (is_object($cmsnav) || dbQuery('\samson\cms\Navigation')->id($cmsnav)->first($cmsnav))) {
+            if ($cmsnav->id != $this->catalogID) {
+                $parent = $cmsnav->parent();
+            }
             // Handle successfull found
         } else {
             $cmsnav = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
+            $parent = $cmsnav;
         }
 
 		// Generate materials table		
@@ -93,12 +97,15 @@ class ProductApplication extends \samson\cms\App
 
         $pager_html = $table->pager->toHTML();
 
-        $catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
+        if (!isset($parent)) {
+            $parent = $cmsnav;
+        }
+        //$catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
 
         $tree = new \samson\treeview\SamsonTree('tree/tree-template', 0, 'product/addchildren');
 
 		// Render table and pager
-		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html, 'tree' => $tree->htmlTree($catalog));
+		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html, 'tree' => $tree->htmlTree($parent));
 	}
 
 	/**
@@ -170,15 +177,17 @@ class ProductApplication extends \samson\cms\App
                 $material->save();
             }
 
+            $parent = $cmsnav->parent();
+
             $cmsnav->Active = 0;
             $cmsnav->save();
         }
 
         $tree = new \samson\treeview\SamsonTree('tree/tree-template', 0, 'product/addchildren');
 
-        $catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
+        //$catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
 
-        return array('status' => 1, 'tree' => $tree->htmlTree($catalog));
+        return array('status' => 1, 'tree' => $tree->htmlTree($parent));
     }
 
     public function __async_structureupdate($structureID = null)
@@ -218,7 +227,13 @@ class ProductApplication extends \samson\cms\App
             $nav->fillFields();
         }
 
-        return $this->__async_table($_POST['ParentID']);
+        if (isset($structureID)) {
+            $parent_id = $structureID;
+        } else {
+            $parent_id = $_POST['ParentID'];
+        }
+
+        return $this->__async_table(dbQuery('\samson\cms\Navigation')->id($parent_id)->first());
     }
 
     public function __async_movestructure($childID, $parentID)
