@@ -4,7 +4,7 @@
 	</a>
 </li>
 <li>
-	<a class="sub_menu_a" href="<?php url_base('material/form', 0, '4'); ?>">
+	<a class="sub_menu_a" href="<?php url_base('product/form', 0, '4'); ?>">
 		<span class="icon icon_add">.</span><?php t('Новый товар')?>
 	</a>
 </li>

@@ -5,10 +5,10 @@
         </span>
     </td>
 	<td class="name limited">		
-		<a href="<?php url_base('material/form','cmsmaterial_id')?>" title="<?php t('Редактировать материал')?>: <?php v('cmsmaterial_Name')?>"><?php v('cmsmaterial_Name')?></a>
+		<a href="<?php url_base('product/form','cmsmaterial_id')?>" title="<?php t('Редактировать материал')?>: <?php v('cmsmaterial_Name')?>"><?php v('cmsmaterial_Name')?></a>
 	</td>
     <td class="brand">
-        <a class="brand_link" href="<?php url_base('material/form','company_id')?>" target="_blank">
+        <a class="brand_link" href="<?php url_base('product/form','company_id')?>" target="_blank">
             <?php v('company_Name'); ?>
         </a>
     </td>
@@ -26,7 +26,7 @@
 	</td>
 
 	<td class="control">
-		<a class="icon2 icon_16x16 icon-edit" href="<?php url_base('material/form','cmsmaterial_id')?>" target="_blank" title="<?php t('Редактировать текущий материал')?>"></a>
+		<a class="icon2 icon_16x16 icon-edit" href="<?php url_base('product/form','cmsmaterial_id')?>" target="_blank" title="<?php t('Редактировать текущий материал')?>"></a>
 		<a class="product_delete icon2 icon_16x16 icon-delete delete" href="<?php url_base('product/remove', 'cmsmaterial_id', 'table', 'nav_id', 'search','pager_current_page')?>" title="<?php t('Удалить текущий материал')?>"></a>
 	</td>			
 </tr>

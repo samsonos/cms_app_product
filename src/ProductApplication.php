@@ -69,8 +69,88 @@ class ProductApplication extends \samson\cms\App
 		;
 	}
 
-	
-	/**
+    /** Generic material form controller */
+    public function __form($material_id = null, $cmsnav = null)
+    {
+        // Create form object
+        $form = new \samson\cms\web\material\Form( $material_id, $cmsnav );
+
+        if ($material_id == 0) {
+            m()->new_material(true);
+        }
+        // Render form
+        m()->html( $form->render() );
+    }
+
+    /** Main logic */
+
+    /** Async form */
+    function __async_form($material_id = null)
+    {
+        // Create form object
+        $form = new \samson\cms\web\material\Form( $material_id );
+
+        // Success
+        return array( 'status' => TRUE, 'form' => $form->render(), 'url' => 'material/form/'.$material_id );
+    }
+
+    /** Async materials save */
+    function __async_save()
+    {
+        // If we have POST data
+        if( isset($_POST) )
+        {
+            // Create empty object
+            /* @var $db_material \samson\cms\CMSMaterial */
+            $db_material = new \samson\cms\CMSMaterial(false);
+
+            // If material identifier is passed and it's valid
+            if( isset($_POST['MaterialID']) && $_POST['MaterialID'] > 0 )
+            {
+                $db_material = dbQuery('samson\cms\cmsmaterial')->id($_POST['MaterialID'])->first();
+            }
+            // New material creation
+            else
+            {
+                // Fill creation ts
+                $db_material->Created = date('h:m:i d.m.y');
+                $db_material->Active = 1;
+            }
+
+            // Make it not draft
+            $db_material->Draft = 0;
+
+            if( isset( $_POST['Name'] )) 		$db_material->Name = $_POST['Name'];
+            if( isset( $_POST['Published'] )) 	$db_material->Published = $_POST['Published'];
+            if( isset( $_POST['type'] )) 	$db_material->type = $_POST['type'];
+            if( isset( $_POST['Url'] )) 		$db_material->Url = $_POST['Url'];
+
+            // Save object to DB
+            $db_material->save();
+
+            // Clear existing relations between material and cmsnavs
+            foreach ( dbQuery('samson\cms\CMSNavMaterial')->MaterialID( $db_material->id )->exec() as $cnm ) $cnm->delete();
+
+            // Iterate relations between material and cmsnav
+            if( isset( $_POST['StructureID'] )) foreach( $_POST['StructureID'] as $cmsnav_id )
+            {
+                // Save record
+                $sm = new CMSNavMaterial(false);
+                $sm->MaterialID = $db_material->id;
+                $sm->StructureID = $cmsnav_id;
+                $sm->Active = 1;
+                $sm->save();
+            }
+
+            // Success
+            return array_merge( array( 'status' => TRUE ), $this->__async_form($db_material->id) );
+        }
+
+        // Fail
+        return array_merge( array( 'status' => FALSE ) );
+    }
+
+    /**
 	 * Render materials table and pager
 	 * @param string $cmsnav 	Parent CMSNav identifier
 	 * @param string $search	Keywords to filter table
