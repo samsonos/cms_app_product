@@ -91,7 +91,7 @@ class ProductApplication extends \samson\cms\App
         $form = new \samson\cms\web\material\Form( $material_id );
 
         // Success
-        return array( 'status' => TRUE, 'form' => $form->render(), 'url' => 'material/form/'.$material_id );
+        return array( 'status' => TRUE, 'form' => $form->render(), 'url' => 'product/form/'.$material_id );
     }
 
     /** Async materials save */
