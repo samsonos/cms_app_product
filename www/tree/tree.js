@@ -35,12 +35,19 @@ s('.products_tree').pageInit(function(obj) {
 
 });
 
+function AppProductPreInit(response) {
+    response = JSON.parse(response);
+    AppProductInit(response);
+}
+
+function AppProductInitPublishButton(obj) {
+    if (confirm(obj.a('title'))) {
+        s.ajax(s('a.publish_href', obj.parent()).a('href'), AppProductPreInit);
+    }
+}
+
 function AppProductInitTableButtons(table) {
-    /*s('.brand_link', table).each(function (link) {
-        link.ajaxClick(function (response) {
-            AppProductInit(response);
-        });
-    });*/
+    s('input#published', table).click(AppProductInitPublishButton, true, true);
 
     s('.product_delete', table).each(function(link) {
         link.ajaxClick(function (response) {
