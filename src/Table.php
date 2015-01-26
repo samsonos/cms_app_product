@@ -50,36 +50,20 @@ class Table extends \samson\cms\web\material\Table
     /** Default table empty row template */
     public $empty_tmpl = 'table/row/empty';
 
-    public $companyID = 0;
-
     /**
      * Constructor
      * @param Navigation $nav 		Parent CMSNav to filter materials
      * @param string $search	Keywords to search in materials
      * @param string $page		Current table page number
      */
-    public function __construct( Navigation & $nav = null, $companyID = 0, $search = null, $page = null )
+    public function __construct( Navigation & $nav = null, $search = null, $page = null )
     {
-        $this->companyID = $companyID;
-
         // Call parent constructor
         parent::__construct($nav, $search, $page);
     }
 
-    public function beforeHandler() {
-        parent::beforeHandler();
-
-        $this->query->join('productcompany');
-    }
-
     public function queryHandler()
     {
-        if ($this->companyID != 0) {
-            $this->query->cond('company_id', $this->companyID);
-        } else {
-            $this->query->cond('company_id', 0, dbRelation::NOT_EQUAL);
-        }
-
         dbQuery('samson\cms\CMSNavMaterial')
             ->cond('StructureID', $this->nav->id)
             ->cond('Active', 1)->fields('MaterialID', $ids);
@@ -94,7 +78,7 @@ class Table extends \samson\cms\web\material\Table
     public function setPagerPrefix()
     {
         // Generate pager url prefix
-        return 'product/table/'.(isset($this->nav) ? $this->nav->id : '0').'/'.(isset($this->companyID) ? $this->companyID : '0').'/'.(isset($this->search{0}) ? $this->search : 'no-search').'/';
+        return 'product/table/'.(isset($this->nav) ? $this->nav->id : '0').'/'.(isset($this->search{0}) ? $this->search : 'no-search').'/';
     }
 
     /** @see \samson\cms\table\Table::row() */
@@ -119,7 +103,6 @@ class Table extends \samson\cms\web\material\Table
         // Render row template
         return m()
             ->cmsmaterial( $db_material )
-            ->company(isset($db_material->onetoone['_productcompany']) ? $db_material->onetoone['_productcompany'] : '')
             ->user( isset($db_material->onetoone['_user']) ? $db_material->onetoone['_user'] : '' )
             ->pager( $this->pager )
             ->nav_id( isset($this->nav) ? $this->nav->id : '0' )

@@ -11,7 +11,6 @@
         </h1>
     <?php endif?>
     <input id="cmsnav_id" type="hidden" value="<?php iv('cmsnav_id'); ?>">
-    <input id="company_id" type="hidden" value="<?php if (isv('company_id')) { v('company_id'); } else { echo 0; } ?>">
     <h1 class="icon2 icon_16x16 left icon-material" title="<?php t('Таблица продуктов')?>"><?php t('Продукты')?>:</h1>
     <!-- End of Header block -->
 

@@ -10,6 +10,7 @@ var searchRequest;
 var searchTimeout;
 
 function  AppProductInit(response){
+    s.trace('here');
     if (response !== undefined) {
         if (response.table_html !== undefined) {
             s('.products_table').html(response.table_html);
@@ -84,12 +85,8 @@ function AppProductSearch(table) {
     search = searchField;
 
     var cmsnav = 0;
-    var company = 0;
     if (s('#cmsnav_id').length) {
         cmsnav = s('#cmsnav_id').val();
-    }
-    if (s('#company_id').length) {
-        company = s('#company_id').val();
     }
     var page = 1;
 
@@ -121,7 +118,7 @@ function AppProductSearch(table) {
                     loader.show(s('.loader-text').val(), true);
 
                     // Perform async request to server for rendering table
-                    s.ajax(s('input#search').a('controller') + cmsnav + '/' + company + '/' + keywords + '/' + page, function(response) {
+                    s.ajax(s('input#search').a('controller') + cmsnav + '/' + keywords + '/' + page, function(response) {
 
                         response = JSON.parse(response);
                         //s('.products_tree').html(response.table_html);
@@ -201,7 +198,6 @@ function AppProductInitTree(tree)
     });
 
     s('.open', tree).each(function(link) {
-        link.href = link.a('href') + '/' + s('#company_id').val();
         link.a('href', link.href);
         link.ajaxClick(function(response) {
             s('.icon-structure').html(link.html());
