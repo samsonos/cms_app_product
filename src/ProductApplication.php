@@ -31,6 +31,9 @@ class ProductApplication extends \samson\cms\web\material\MaterialApplication
 
     protected $catalogID = 4;
 
+    /** @var \samson\cms\table\Table */
+    protected $table;
+
 	/** Controllers */
 	
 	/** Generic controller */
@@ -94,12 +97,13 @@ class ProductApplication extends \samson\cms\web\material\MaterialApplication
             $parent = $cmsnav;
         }
 
-		// Generate materials table		
-		$table = new Table($cmsnav, $search, $page);
+        if (!isset ($this->table)) {
+            $this->table = new Table($cmsnav, $search, $page);
+        }
 
-        $table_html = $table->render();
+        $table_html = $this->table->render();
 
-        $pager_html = $table->pager->toHTML();
+        $pager_html = $this->table->pager->toHTML();
 
         if (!isset($parent)) {
             $parent = $cmsnav;
