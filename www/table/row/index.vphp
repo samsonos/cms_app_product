@@ -7,11 +7,6 @@
 	<td class="name limited">		
 		<a href="<?php url_base('product/form','cmsmaterial_id')?>" title="<?php t('Редактировать материал')?>: <?php v('cmsmaterial_Name')?>"><?php v('cmsmaterial_Name')?></a>
 	</td>
-    <td class="brand">
-        <a class="brand_link" href="<?php url_base('product/form','company_id')?>" target="_blank">
-            <?php v('company_Name'); ?>
-        </a>
-    </td>
     <td class="balance">
         <?php v('Остаток'); ?>
     </td>

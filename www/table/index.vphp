@@ -3,7 +3,6 @@
 		<tr>
 			<th class="id">#</th>
 			<th class="name"><?php t('Продукт')?></th>
-			<th class="brand" title="<?php t('Компания') ?>"><?php t('Компания') ?></th>
             <th class="balance" title="<?php t('Остаток')?>"><?php t('Остаток')?></th>
             <th class="price" title="<?php t('Цена')?>"><?php t('Цена')?></th>
             <th class="structure"><?php t('Категория')?></th>
