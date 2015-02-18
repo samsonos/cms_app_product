@@ -82,7 +82,7 @@ class Table extends \samson\cms\web\material\Table
     }
 
     /** @see \samson\cms\table\Table::row() */
-    public function row( & $db_material, Pager & $pager = null)
+    public function row( & $db_material, Pager & $pager = null, $module = null)
     {
         // Set table row view context
         m()->view($this->row_tmpl);

@@ -22,6 +22,7 @@ class ProductApplication extends \samson\cms\web\material\MaterialApplication
 {
 	/** Application name */
 	public $app_name = 'Товары';
+	public $name = 'Товары';
 	
 	/** Identifier */
 	protected $id = 'product';
