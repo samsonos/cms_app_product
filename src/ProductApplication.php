@@ -18,7 +18,7 @@ use samson\cms\CMSNavMaterial;
  *
  * @package samson\cms\web\material
  */
-class ProductApplication extends \samson\cms\web\material\MaterialApplication
+class ProductApplication extends \samsoncms\app\material\Application
 {
 	/** Application name */
 	public $app_name = 'Товары';
