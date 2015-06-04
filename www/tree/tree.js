@@ -2,27 +2,17 @@
  * Created by onysko on 05.11.2014.
  */
 
-var searchField = s('input#search');
-var searchInitiated = false;
 var loader = new Loader(s('#content'));
-// Ajax request handle
-var searchRequest;
-var searchTimeout;
 
 function  AppProductInit(response){
-    s.trace('here');
     if (response !== undefined) {
-        if (response.table_html !== undefined) {
-            s('.products_table').html(response.table_html);
-        }
+        if (response.collection_html) s('.products_table').html(response.collection_html);
+        if (response.collection_pager) s('.table-pager').html(response.collection_pager);
 
-        if (response.pager_html !== undefined) {
-            s('.table-pager').html(response.pager_html);
-        }
+        templateList(s('.table2'), s('.table-pager'), function() {
+            SamsonCMS_Input.update(s('body'));
+        });
     }
-    s('.products-table').fixedHeader();
-    AppProductInitTableButtons(s('.products_table'));
-    AppProductInitPagerButtons(s('.table-pager'));
 }
 
 s('.products_tree').pageInit(function(obj) {
@@ -31,110 +21,7 @@ s('.products_tree').pageInit(function(obj) {
     s('ul', obj).addClass('tree-root');
 
     AppProductInitTree(obj);
-
-    AppProductSearch(s('.products_table'));
-
 });
-
-function AppProductPreInit(response) {
-    response = JSON.parse(response);
-    AppProductInit(response);
-}
-
-function AppProductInitPublishButton(obj) {
-    if (confirm(obj.a('title'))) {
-        s.ajax(s('a.publish_href', obj.parent()).a('href'), AppProductPreInit);
-    }
-}
-
-function AppProductInitTableButtons(table) {
-    s('input#published', table).click(AppProductInitPublishButton, true, true);
-
-    s('.product_delete', table).each(function(link) {
-        link.ajaxClick(function (response) {
-            loader.hide();
-            AppProductInit(response);
-        }, function() {
-            // Create generic loader
-            loader.show('Подождите', true);
-            return true;
-        });
-    });
-}
-
-function AppProductInitPagerButtons(pager)
-{
-    s('a', pager).each(function (link) {
-        link.ajaxClick(function (response) {
-            loader.hide();
-            AppProductInit(response);
-        }, function() {
-            // Create generic loader
-            loader.show('Подождите', true);
-            return true;
-        });
-    });
-}
-
-/**
- * Asynchronous material search
- * @param search Search query
- */
-function AppProductSearch(table) {
-    // Safely get object
-    search = searchField;
-
-    var cmsnav = 0;
-    if (s('#cmsnav_id').length) {
-        cmsnav = s('#cmsnav_id').val();
-    }
-    var page = 1;
-
-
-
-    // Key up handler
-    search.keyup(function(obj, p, e) {
-        // If we have not send any search request and this is not Enter character
-        if (searchRequest == undefined && e.which != 13) {
-            // Reset timeout on key press
-            if (searchTimeout != undefined) clearTimeout(searchTimeout);
-
-            // Set delayed function
-            searchTimeout = window.setTimeout(function() {
-                // Get search input
-                var keywords = obj.val();
-
-                if (keywords.length < 2) keywords = '';
-
-                // Disable input
-                search.DOMElement.enabled = false;
-
-                // Avoid multiple search requests
-                if (!searchInitiated) {
-                    // Set flag
-                    searchInitiated = true;
-
-                    // Show loader with i18n text and black bg
-                    loader.show(s('.loader-text').val(), true);
-
-                    // Perform async request to server for rendering table
-                    s.ajax(s('input#search').a('controller') + cmsnav + '/' + keywords + '/' + page, function(response) {
-
-                        response = JSON.parse(response);
-                        //s('.products_tree').html(response.table_html);
-                        AppProductInit(response);
-
-                        loader.hide();
-
-                        // Release flag
-                        searchInitiated = false;
-                    });
-                }
-
-            }, 1000);
-        }
-    });
-}
 
 function AppProductInitTree(tree)
 {
@@ -173,14 +60,6 @@ function AppProductInitTree(tree)
                                 moveFlag = true;
                             }
                         }
-                    },
-                    activate : function() {
-                        //s.trace(12345);
-                        //$('.drag_here').show();
-                    },
-                    deactivate : function() {
-                        //s.trace(123456);
-                        //$('.drag_here').hide();
                     }
                 });
             },
@@ -213,6 +92,7 @@ function AppProductInitTree(tree)
     });
 
     s('.product_control.material_move', tree).click(function(link) {
+        s.trace('fdssdf');
         var selectForm = s(".table_form");
         var selectAction = 'product/move/' + link.a('structure');
 

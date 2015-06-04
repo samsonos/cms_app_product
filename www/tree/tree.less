@@ -12,6 +12,7 @@
   padding: 0;
   position: relative;
 }
-.product_control.icon-move-materials { background-image: url('../img/material_add.png'); }
-.product_control.icon-move-materials:hover { background-image: url('../img/material_add_hover.png'); }
-.product_control.icon-move-materials:active { background-image: url('../img/material_add_active.png'); }
+
+.icon-move-materials {
+  &:before { content: @fa-var-paste; }
+}

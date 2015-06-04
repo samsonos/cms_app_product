@@ -2,9 +2,8 @@
 	<a class="sub_menu_a" href="<?php url_base('product')?>">
         <?php t('Все')?>
 	</a>
-</li>
-<li>
+</li><li>
 	<a class="sub_menu_a" href="<?php url_base('product/form', 0, '4'); ?>">
-		<span class="icon icon_add">.</span><?php t('Новый товар')?>
+		<?php t('Новый товар')?>
 	</a>
 </li>
