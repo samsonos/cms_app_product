@@ -1,9 +1,7 @@
 <?php
-namespace samson\cms\web\product;
+namespace samsoncms\app\product;
 
 use samson\activerecord\dbRelation;
-use samson\activerecord\dbConditionArgument;
-use samson\activerecord\dbConditionGroup;
 use samson\cms\cmsmaterial;
 use samson\cms\CMSNav;
 use samson\activerecord\dbQuery;
@@ -18,76 +16,64 @@ use samson\cms\CMSNavMaterial;
  *
  * @package samson\cms\web\material
  */
-class ProductApplication extends \samsoncms\app\material\Application
+class Application extends \samsoncms\app\material\Application
 {
-	/** Application name */
-	public $app_name = 'Товары';
-	public $name = 'Товары';
-	
-	/** Identifier */
-	protected $id = 'product';
-	
-	/** Table rows count */
-	protected $table_rows = 15;
+    /** @inheritdoc */
+    public $name = 'Товары';
 
+    /** @inheritdoc */
+    public $description = 'Товары';
+
+    /** @inheritdoc */
+    protected $id = 'product';
+
+    /** @inheritdoc */
+    public $icon = 'th-list';
+
+    /** @inheritdoc */
+    public $collectionClass = '\samsoncms\app\product\Collection';
+
+    /** @var int Catalog root structure identifier */
     protected $catalogID = 4;
 
-    /** @var \samson\cms\table\Table */
-    protected $table;
-
-	/** Controllers */
-	
-	/** Generic controller */
-	public function __handler($cmsnav = null, $search = null, $page = null)
-	{
-        // Generate localized title
-        $title = t($this->app_name, true);
-
-        // Set view scope
-        $this->view('index');
-
-		// Try to find cmsnav
-		if (isset($cmsnav) && dbQuery('\samson\cms\Navigation')->id($cmsnav)->first($cmsnav)) {
-            // Add structure title
-            $title = t($cmsnav->Name, true).' - '.$title;
-        } else {
-            $cmsnav = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
-        }
-
-        // Pass Navigation to view
-        $this->cmsnav($cmsnav);
-
-		// Old-fashioned direct search input form POST if not passed
-        $search = !isset($search) ? (isset($_POST['search']) ? $_POST['search'] : '') : $search;
-
-		// Set view data
-		$this
-            ->title($title)
-            ->cmsnav_id($this->catalogID)
-			->set($this->__async_table($cmsnav, $search, $page))
-		;
-	}
-
-    /** Async form */
-    function __async_form($material_id = null, $cmsnav = null)
+    /** @inheritdoc */
+    public function __handler($navigationId = '0', $search = '', $page = 1)
     {
-        // Create form object
-        $form = new \samson\cms\web\material\Form( $material_id );
-
-        // Success
-        return array('status' => TRUE, 'form' => $form->render(), 'url' => 'product/form/'.$material_id );
+        $navigationId = $navigationId == '0' ? $this->catalogID : $navigationId;
+        // Pass all parameters to parent handler with default values
+        parent::__handler($navigationId, $search, $page);
     }
 
-    /**
-	 * Render materials table and pager
-	 * @param string $cmsnav 	Parent CMSNav identifier
-	 * @param string $search	Keywords to filter table
-	 * @param string $page		Current table page	 
-	 * @return array Collection of rendered table and pager data
-	 */
-	function __async_table($cmsnav = null, $search = null, $page = null)
-	{
-		// Try to find cmsnav
+    /** @inheritdoc */
+    public function __async_collection($navigationId = '0', $search = '', $page = 1)
+    {
+        // Save pager size in session
+        if (isset($_GET['pagerSize'])) {
+            $_SESSION['pagerSize'] = $_GET['pagerSize'];
+            // delete get parameter from pager links
+            unset($_GET['pagerSize']);
+        }
+        // Set filtration info
+        $navigationId = isset($navigationId) ? $navigationId : '0';
+        $search = !empty($search) ? $search : 0;
+        $page = isset($page) ? $page : 1;
+
+        // Create pager for material collection
+        $pager = new Pager(
+            $page,
+            isset($_SESSION['pagerSize']) ? $_SESSION['pagerSize'] : $this->pageSize,
+            $this->id . '/' . self::VIEW_TABLE_NAME . '/' . $navigationId . '/' . $search
+        );
+
+        // Create material collection
+        $collection = new $this->collectionClass($this, new dbQuery(), $pager);
+
+        // Add navigation filter
+        if (isset($navigationId) && !empty($navigationId)) {
+            $collection = $collection->navigation(array($navigationId));
+        }
+
+        // Try to find cmsnav
         if (isset($cmsnav) && (is_object($cmsnav) || dbQuery('\samson\cms\Navigation')->id($cmsnav)->first($cmsnav))) {
             if ($cmsnav->id != $this->catalogID) {
                 $parent = $cmsnav->parent();
@@ -98,24 +84,16 @@ class ProductApplication extends \samsoncms\app\material\Application
             $parent = $cmsnav;
         }
 
-        if (!isset ($this->table)) {
-            $this->table = new Table($cmsnav, $search, $page);
-        }
-
-        $table_html = $this->table->render();
-
-        $pager_html = $this->table->pager->toHTML();
-
-        if (!isset($parent)) {
-            $parent = $cmsnav;
-        }
-        //$catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
-
         $tree = new \samson\treeview\SamsonTree('tree/tree-template', 0, 'product/addchildren');
 
-		// Render table and pager
-		return array('status' => 1, 'table_html' => $table_html, 'pager_html' => $pager_html, 'tree' => $tree->htmlTree($parent));
-	}
+        return array_merge(
+            array('status' => 1, 'tree' => $tree->htmlTree($parent)),
+            $collection
+                ->search($search)
+                ->fill()
+                ->toView(self::VIEW_TABLE_NAME . '_')
+        );
+    }
 
     public function __async_move($structureID)
     {
@@ -140,7 +118,7 @@ class ProductApplication extends \samsoncms\app\material\Application
                         $strmat->StructureID = $cmsnav->id;
                         $strmat->Active = 1;
                         $strmat->save();
-                        if ($cmsnav->Url == 'katalog') {
+                        if ($cmsnav->id == $this->catalogID) {
                             break;
                         } else {
                             $cmsnav = $cmsnav->parent();
@@ -150,7 +128,7 @@ class ProductApplication extends \samsoncms\app\material\Application
             }
         }
 
-        return $this->__async_table($structureID);
+        return $this->__async_collection($structureID);
     }
 
     public function __async_structuredelete($structureID)
@@ -171,7 +149,6 @@ class ProductApplication extends \samsoncms\app\material\Application
 
         $tree = new \samson\treeview\SamsonTree('tree/tree-template', 0, 'product/addchildren');
 
-        //$catalog = dbQuery('\samson\cms\Navigation')->id($this->catalogID)->first();
 
         return array('status' => 1, 'tree' => $tree->htmlTree($parent));
     }
@@ -219,7 +196,7 @@ class ProductApplication extends \samsoncms\app\material\Application
             $parent_id = $_POST['ParentID'];
         }
 
-        return $this->__async_table(dbQuery('\samson\cms\Navigation')->id($parent_id)->first());
+        return $this->__async_collection($parent_id);
     }
 
     public function __async_movestructure($childID, $parentID)
