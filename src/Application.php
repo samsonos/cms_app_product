@@ -33,8 +33,14 @@ class Application extends \samsoncms\app\material\Application
     /** @inheritdoc */
     public $collectionClass = '\samsoncms\app\product\Collection';
 
+    /** @var bool Hide app from sidebar menu */
+    public $hide = true;
+
     /** @var int Catalog root structure identifier */
     protected $catalogID = 4;
+
+    /** @var array System structures array */
+    protected $systemStructureIDs = array(0);
 
     /** @inheritdoc */
     public function __handler($navigationId = '0', $search = '', $page = 1)
@@ -54,7 +60,7 @@ class Application extends \samsoncms\app\material\Application
             unset($_GET['pagerSize']);
         }
         // Set filtration info
-        $navigationId = isset($navigationId) ? $navigationId : '0';
+        $navigationId = $navigationId == '0' ? $this->catalogID : $navigationId;
         $search = !empty($search) ? $search : 0;
         $page = isset($page) ? $page : 1;
 
@@ -101,7 +107,7 @@ class Application extends \samsoncms\app\material\Application
         $cmsnav = null;
 
         if (isset($_POST['materialIds']) && !empty($_POST['materialIds']) && dbQuery('\samson\cms\Navigation')->id($structureID)->first($cmsnav)) {
-            if (dbQuery('samson\cms\CMSNavMaterial')->cond('MaterialID', $_POST['materialIds'])->cond('StructureID', 4123, dbRelation::NOT_EQUAL)->exec($data)) {
+            if (dbQuery('samson\cms\CMSNavMaterial')->cond('MaterialID', $_POST['materialIds'])->cond('StructureID', $this->systemStructureIDs, dbRelation::NOT_EQUAL)->exec($data)) {
                 $currentNav = $cmsnav;
                 foreach ($data as $strmat) {
                     $strmat->delete();

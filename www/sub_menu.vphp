@@ -1,9 +1,17 @@
-<li>
-	<a class="sub_menu_a" href="<?php url_base('product')?>">
-        <?php t('Все')?>
-	</a>
+<li class="template-sub-menu-search">
+    <input type="text"
+           id="search"
+           controller="<?php module_url('collection') ?>"
+           placeholder="<?php t('Поисковый запрос')?>..."
+           value="<?php iv('search')?>"
+           name="template-search"
+        >
 </li><li>
-	<a class="sub_menu_a" href="<?php url_base('product/form', 0, '4'); ?>">
-		<?php t('Новый товар')?>
-	</a>
+    <a class="sub_menu_a" href="<?php url_base('product')?>">
+        <?php t('Все')?>
+    </a>
+</li><li>
+    <a class="sub_menu_a" href="<?php url_base('product/form', 0, '4'); ?>">
+        <?php t('Новый товар')?>
+    </a>
 </li>
