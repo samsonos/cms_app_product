@@ -1,0 +1,4 @@
+<label for="sizeSelect"><?php t('Элементов на странице') ?></label>
+<select name="sizeSelect" class="sizeSelect" id="sizeSelect" data-href="<?php iv('url') ?>">
+    <?php v('options') ?>
+</select>

@@ -38,10 +38,10 @@ class Application extends \samsoncms\app\material\Application
     public $hide = true;
 
     /** @var int Catalog root structure identifier */
-    protected $catalogID = 3;
+    public $catalogID = 0;
 
     /** @var array System structures array */
-    protected $systemStructureIDs = array(0);
+    public $systemStructureIDs = array(0);
 
     /** @inheritdoc */
     public function __handler($navigationId = '0', $search = '', $page = 1)
@@ -137,11 +137,7 @@ class Application extends \samsoncms\app\material\Application
             $nav->fillFields();
         }
 
-        if (isset($structureID)) {
-            $parent_id = $structureID;
-        } else {
-            $parent_id = $_POST['ParentID'];
-        }
+        $parent_id = $structureID > 0 ? $structureID : $_POST['ParentID'];
 
         return $this->__async_collection($parent_id);
     }
@@ -179,14 +175,9 @@ class Application extends \samsoncms\app\material\Application
         // Get relations of new parent
         $stRel = $this->query->entity('\samson\activerecord\structure_relation')->child_id($parentID)->exec();
         while ($stRel) {
-            // Save ids for loop query
-            $ids = array();
             // Break flag
             $break = false;
             foreach ($stRel as $strR) {
-                // Save current relation id
-                $ids[] = $strR->id;
-
                 // Save parent
                 $relIds[] = $strR->parent_id;
                 if ($strR->parent_id == $this->catalogID) {
