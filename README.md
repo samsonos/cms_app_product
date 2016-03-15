@@ -1,11 +1,6 @@
 # SamsonCMS product catalog management module
 
-[![Latest Stable Version](https://poser.pugx.org/samsonos/cms_app_product/v/stable.svg)](https://packagist.org/packages/samsonos/cms_app_product)
-[![Build Status](https://scrutinizer-ci.com/g/samsonos/cms_app_product/badges/build.png?b=master)](https://scrutinizer-ci.com/g/samsonos/cms_app_product/build-status/master)
-[![Code Coverage](https://scrutinizer-ci.com/g/samsonos/cms_app_product/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/samsonos/cms_app_product/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/samsonos/cms_app_product/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/samsonos/cms_app_product/?branch=master) 
 [![Total Downloads](https://poser.pugx.org/samsonos/cms_app_product/downloads.svg)](https://packagist.org/packages/samsonos/cms_app_product)
-[![Stories in Ready](https://badge.waffle.io/samsonos/cms_app_product.png?label=ready&title=Ready)](https://waffle.io/samsonos/cms_app_product)
 
 This module is pretty and simple [SamsonCMS](https://github.com/samsoncms/cms) application for catalog management of e-commerce web-sites.
 
@@ -13,7 +8,7 @@ Product module accommodates two basic SamsonCMS applications - [material](https:
 
 Using UI-function CMS administrator can modify catalog structure, move products from one category to another, make CRUD actions for categories and sub-categories.
 
-Feel free to extend this application for your custom applications.
+Feel free to extend this application for your custom extensions.
 
 ##Configuration  
 
