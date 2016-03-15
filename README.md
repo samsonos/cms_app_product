@@ -8,8 +8,11 @@
 [![Stories in Ready](https://badge.waffle.io/samsonos/cms_app_product.png?label=ready&title=Ready)](https://waffle.io/samsonos/cms_app_product)
 
 This module is pretty and simple [SamsonCMS](https://github.com/samsoncms/cms) application for catalog management of e-commerce web-sites.
+
 Product module accommodates two basic SamsonCMS applications - [material](https://github.com/samsoncms/material) and [structure](https://github.com/samsonos/cms_app_navigation).
+
 Using UI-function CMS administrator can modify catalog structure, move products from one category to another, make CRUD actions for categories and sub-categories.
+
 Feel free to extend this application for your custom applications.
 
 ##Configuration  
@@ -48,5 +51,6 @@ Take a look on the example of [SamsonCMS](https://github.com/samsoncms/cms) e-co
         * ```__CATALOG_SUB_CATEGORY```
             * ```__CATALOG_SUB_SUB_CATEGORY```
             * ```__CATALOG_SUB_SUB_CATEGORY```
+
 In this example you must set ```$catalogID``` in configuration equal to ```__CATALOG_CATEGORY``` identifier.
 
