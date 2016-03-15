@@ -27,10 +27,10 @@
 
 <!-- Content section -->
 <section id="content">
-    <div class="products_tree" style="position: absolute;  width: 22%; bottom: 0; top: 0; left: 10px; overflow-x: hidden; overflow-y: auto;">
+    <div class="products_tree" style="display:inline-block; width: 22%; vertical-align: top; overflow-x: hidden; overflow-y: auto;">
         <?php v('tree'); ?>
     </div>
-    <div class="products_table" style="position: absolute; width: 77%; bottom: 0; top: 0; right: 0; overflow-x: hidden; overflow-y: auto;">
+    <div class="products_table" style="display:inline-block; width: 77%; vertical-align: top; overflow-x: hidden; overflow-y: auto;">
         <form class="table_form" method="post">
             <?php v('collection_html'); ?>
         </form>

@@ -1,0 +1,8 @@
+<div class="table2 custom-table2 default">
+    <div class="table2-row table2-header-row">
+        <?php iv('header')?>
+    </div>
+    <div class="table2-body">
+        <?php iv('items') ?>
+    </div>
+</div>

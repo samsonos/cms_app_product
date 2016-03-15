@@ -10,6 +10,7 @@ namespace samsoncms\app\product;
 
 
 use samsoncms\app\material\field\Navigation;
+use samsoncms\app\product\field\CheckBox;
 use samsoncms\field\Generic;
 use samsoncms\field\Control;
 
@@ -23,10 +24,9 @@ class Collection extends \samsoncms\app\material\Collection
 
         // Fill default column fields for collection
         $this->fields = array(
-            new Generic('MaterialID', '#', 0, 'id', false),
+            new CheckBox('MaterialID', '#', 0, 'id', false),
             new Generic('Name', t('Наименование', true), 0),
             new Generic('Url', t('Идентификатор', true), 0),
-            new Navigation(),
             new Generic('Published', t('Показывать', true), 11, 'publish'),
             new Control(),
         );

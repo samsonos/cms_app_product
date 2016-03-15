@@ -14,21 +14,21 @@ if( isset( $db_structure) ) $db_structure = & $db_structure;
         <a class="structure_id" style="display:none;"><?php echo $db_structure->id ?></a>
 
         <!-- ADD LINK !-->
-        <a class="product_control add icon2 icon_16x16 icon-add"
+        <a class="control add icon2 icon_16x16 icon-add"
            structure = "<?php echo $db_structure->id ?>"
            href="<?php url_base('structure/form/', $db_structure->id, 0) ?>"
            title="Добавить подчинённый элемент структуры сайта">
         </a>
 
         <!-- EDIT LINK !-->
-        <a class="product_control editstr icon2 icon_16x16 icon-edit"
+        <a class="control editstr icon2 icon_16x16 icon-edit"
            structure = "<?php echo $db_structure->id ?>"
            href="<?php url_base('structure/form/', 'parentid', $db_structure->id) ?>"
            title="Редактировать данный ЭСС">
         </a>
 
         <!-- DELETE LINK !-->
-        <a class="product_control delete icon2 icon_16x16 icon-delete"
+        <a class="control delete icon2 icon_16x16 icon-delete"
            structure = "<?php echo $db_structure->id ?>"
            href="<?php url_base('product/structuredelete/', $db_structure->id)?>"
            title="Удалить данный ЭСС">

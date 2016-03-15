@@ -6,11 +6,11 @@ var loader = new Loader(s('#content'));
 
 function  AppProductInit(response){
     if (response !== undefined) {
-        if (response.collection_html) s('.products_table').html(response.collection_html);
+        if (response.collection_html) s('.table_form').html(response.collection_html);
         if (response.collection_pager) s('.table-pager').html(response.collection_pager);
+        SamsonCMS_Input.update(s('body'));
+        templateList(s('.table2'), s('.table-pager'), s('.sizeSelect'), function() {
 
-        templateList(s('.table2'), s('.table-pager'), function() {
-            SamsonCMS_Input.update(s('body'));
         });
     }
 }
@@ -32,14 +32,174 @@ function AppProductInitTree(tree)
         }
     );
 
+    var parent;
+    /**
+     * обработчик добавления новой записи
+     */
+    s(".control.add", tree).tinyboxAjax({
+        html:'html',
+        renderedHandler: function(response, tb) {
+            /** автоматический транслит Урл*/
+            s("#Name").keyup(function(obj) {
+                s("#Url").val(s("#Name").translit());
+            });
+            /** транслит по кнопке */
+            s("#generateUrl").click(function(obj) {
+                if (confirm("Вы точно хотите сгенерировать адрес?")) {
+                    s("#Url").val(s("#Name").translit());
+                }
+            });
+            s('.structure_submit_button').click(function(link) {
+                    var selectForm = s(".form2");
+                    var selectAction = 'cms/product/structureupdate/';
+                    selectForm.ajaxForm({
+                        'url': selectAction,
+                        'handler': function(respTxt){
+                            respTxt = JSON.parse(respTxt);
+                            if (respTxt.tree !== undefined) {
+                                s('.products_tree').html(respTxt.tree);
+                                AppProductInitTree(s('.products_tree'));
+                            }
+                            AppProductInit(respTxt);
+                            tb.close();
+                        }
+                    });
+                return false;
+            });
+            s(".cancel-button").click(function() {
+                tb.close();
+            });
+            //CMSNavigationFormInit();
+        },
+        beforeHandler: function(link) {
+            parent = link.parent(' sjs-treeview');
+            loader.show(s('#loader-text').html(), true);
+            return true;
+        },
+        responseHandler: function() {
+            loader.hide();
+            return true;
+        }
+    });
+    /**
+     * обработчик редактирование новой записи
+     */
+    s(".control.editstr", tree).tinyboxAjax({
+        html:'html',
+        renderedHandler: function(response, tb) {
+
+            var generateApplicationElement = s("#generate-application"),
+                iconPreviewApplicationElement = s(".preview-icon-application"),
+                typeStructureElement = s(".type-of-structure"),
+                iconApplicationElement = s("#icon-application"),
+                allowTypeValues = [0], // That is all allowed values of select structure which can open applicaiton setting
+                applicationBlock = s('.application-setting'),
+                faClasses = 'icon icon2 fa-2x icon2-';
+
+            // Handle generate application checkbox
+            generateApplicationElement.click(function(e) {
+                var value = e.DOMElement.checked,
+                    blockOutput = s('.block-show-output-application');
+
+                // If true show output block or hide it
+                if (value) {
+                    blockOutput.css('display', 'block');
+                } else {
+                    blockOutput.css('display', 'none');
+                }
+            });
+
+            // Change icon of preview block
+            iconApplicationElement.change(function(e) {
+                s('span', iconPreviewApplicationElement).a('class', faClasses + e.val());
+            });
+
+            // Set event on change type of structure
+            typeStructureElement.change(changeFormApplicationByTypeStructure);
+
+            // Exec manually when the first loaded
+            changeFormApplicationByTypeStructure();
+
+            /**
+             * Show or hide application setting by structure type
+             */
+            function changeFormApplicationByTypeStructure() {
+                var value = typeStructureElement.val();
+
+                // If there is right value than open application setting
+                if (allowTypeValues.indexOf(parseInt(value)) !== -1) {
+                    applicationBlock.css('display', 'block');
+                } else {
+                    // Set manually false value of checkboxes
+                    generateApplicationElement.DOMElement.checked = false;
+                    applicationBlock.css('display', 'none');
+                }
+            }
+
+            s("#generateUrl").click(function(obj) {
+                if (confirm("Вы точно хотите сгенерировать адрес?")) {
+                    s("#Url").val(s("#Name").translit());
+                }
+            });
+            s('.structure_submit_button').click(function(link) {
+                var selectForm = s(".form2");
+                var selectAction = 'cms/product/structureupdate/' + link.a('structure') + '/';
+                selectForm.ajaxForm({
+                    'url': selectAction,
+                    'handler': function(respTxt){
+                        respTxt = JSON.parse(respTxt);
+                        if (respTxt.tree !== undefined) {
+                            s('.products_tree').html(respTxt.tree);
+                            AppProductInitTree(s('.products_tree'));
+                        }
+                        AppProductInit(respTxt);
+                        tb.close();
+                    }
+                });
+
+                return false;
+            });
+            s(".cancel-button").click(function() {
+                tb.close();
+            });
+        },
+        beforeHandler: function(link) {
+            parent = link.parent(' sjs-treeview');
+            loader.show(s('#loader-text').html(), true);
+            return true;
+        },
+        responseHandler: function() {
+            loader.hide();
+            return true;
+        }
+    });
+
+    /**
+     * обработка удаления
+     */
+    s(".control.delete", tree).ajaxClick(function(response) {
+        parent.html(response.tree);
+        parent.treeview(
+            true,
+            function(tree) {
+                AppProductInitTree(tree);
+            }
+        );
+        loader.hide();
+    }, function(link) {
+        parent = link.parent('sjs-treeview');
+        if (confirm("Are you sure that you want to delete current SSE?")) {
+            loader.show('Deleting', true);
+            return true;
+        } else {
+            return false;
+        }
+    });
+
     var parentID;
     var childID;
     var parentName;
     var moveFlag = false;
-
-    if (!tree.hasClass('sjs-treeview')) {
-        tree = s('.sjs-treeview', tree);
-    }
 
     $(tree.DOMElement).not('.tree-root').find('.collapsed').each(function() {
         $(this).draggable({
@@ -52,7 +212,7 @@ function AppProductInitTree(tree)
                     drop : function(event, ui) {
                         if (!$(this).hasClass('current-tree')) {
                             parentName = $(this).parent().find('a').first().text();
-                            if (confirm('Вы уверены, что хотите переместить выбранную структуру в категорию ' + parentName.trim() + '?')) {
+                            if (confirm('Are you sure that you want to put selected category in ' + parentName.trim() + '?')) {
                                 $(this).find('.last').removeClass('last').addClass('notlast');
                                 $(this).append(ui.draggable);
                                 ui.draggable.removeClass('notlast').addClass('last');
@@ -65,10 +225,10 @@ function AppProductInitTree(tree)
             },
             stop : function() {
                 if (moveFlag) {
-                    loader.show('Перемещаю структуру', true);
+                    loader.show('Waiting', true);
                     childID = $(this).find('.structure_id').first().text();
 
-                    s.ajax('product/movestructure/' + childID + '/' + parentID, function(response) {
+                    s.ajax('cms/product/movestructure/' + childID + '/' + parentID + '/', function(response) {
                         loader.hide();
                     });
                 }
@@ -86,15 +246,14 @@ function AppProductInitTree(tree)
             AppProductInit(response);
         }, function() {
             // Create generic loader
-            loader.show('Подождите', true);
+            loader.show('Waiting', true);
             return true;
         });
     });
 
     s('.product_control.material_move', tree).click(function(link) {
-        s.trace('fdssdf');
         var selectForm = s(".table_form");
-        var selectAction = 'product/move/' + link.a('structure');
+        var selectAction = 'cms/product/move/' + link.a('structure') + '/';
 
         selectForm.ajaxForm({
             'url': selectAction,
@@ -105,120 +264,5 @@ function AppProductInitTree(tree)
         });
 
         return false;
-    });
-
-    var parent;
-
-    s(".product_control.add", tree).tinyboxAjax({
-        html:'html',
-        renderedHandler: function(response, tb) {
-            /** автоматический транслит Урл*/
-            s("#Name").keyup(function(obj) {
-                s("#Url").val(s("#Name").translit());
-            });
-            /** транслит по кнопке */
-            s("#generateUrl").click(function(obj) {
-                if (confirm("Вы точно хотите сгенерировать адрес?")) {
-                    s("#Url").val(s("#Name").translit());
-                }
-            });
-
-            s('.structure_submit_button').click(function(link) {
-                var selectForm = s(".form2");
-                var selectAction = 'product/structureupdate/' + link.a('structure');
-                selectForm.ajaxForm({
-                    'url': selectAction,
-                    'handler': function(respTxt){
-                        respTxt = JSON.parse(respTxt);
-                        if (respTxt.tree !== undefined) {
-                            parent.html(respTxt.tree);
-                            AppProductInitTree(parent);
-                        }
-                        AppProductInit(respTxt);
-                        tb.close();
-                    }
-                });
-
-                return false;
-            });
-
-            s(".cancel-button").click(function() {
-                tb.close();
-            });
-
-        },
-        beforeHandler: function(link) {
-            parent = link.parent(' sjs-treeview');
-            loader.show('Загрузка формы', true);
-            return true;
-        },
-        responseHandler: function() {
-            loader.hide();
-            return true;
-        }
-    });
-    /**
-     * обработчик редактирование новой записи
-     */
-    s(".product_control.editstr", tree).tinyboxAjax({
-        html:'html',
-        renderedHandler: function(response, tb) {
-            s("#generateUrl").click(function(obj) {
-                if (confirm("Вы точно хотите сгенерировать адрес?")) {
-                    s("#Url").val(s("#Name").translit());
-                }
-            });
-
-            s('.structure_submit_button').click(function(link) {
-                var selectForm = s(".form2");
-                var selectAction = 'product/structureupdate/' + link.a('structure');
-                selectForm.ajaxForm({
-                    'url': selectAction,
-                    'handler': function(respTxt){
-                        respTxt = JSON.parse(respTxt);
-                        if (respTxt.tree !== undefined) {
-                            parent.html(respTxt.tree);
-                            AppProductInitTree(parent);
-                        }
-                        AppProductInit(respTxt);
-                        tb.close();
-                    }
-                });
-
-                return false;
-            });
-
-            s(".cancel-button").click(function() {
-                tb.close();
-            });
-        },
-        beforeHandler: function(link) {
-            parent = link.parent(' sjs-treeview');
-            loader.show('Загрузка формы', true);
-            return true;
-        },
-        responseHandler: function() {
-            loader.hide();
-            return true;
-        }
-    });
-
-    s(".product_control.delete").ajaxClick(function(response) {
-        parent.html(response.tree);
-        parent.treeview(
-            true,
-            function(tree) {
-                AppProductInitTree(tree);
-            }
-        );
-        loader.hide();
-    }, function(link) {
-        parent = link.parent(' sjs-treeview');
-        if (confirm("Вы уверены, что хотите безвозвратно удалить структуру?")) {
-            loader.show('Удаление структуры', true);
-            return true;
-        } else {
-            return false;
-        }
     });
 }
