@@ -17,7 +17,7 @@ All available configuration fields are:
 class ProductConfig extends \samson\core\Config 
 {
     /** @var int Identifier of catalog root structure */
-    public $catalogID = __MY_CATALOG_ID;
+    public $catalogID = __CATALOG_ROOT_STRUCTURE;
 
     /** @var array Collection of system structures identifiers. These categories will be ignored in all application actions */
     public $systemStructureIDs = array(__SYSTEM_STRUCTURE_ID_1, __SYSTEM_STRUCTURE_ID_2, __SYSTEM_STRUCTURE_ID_3);
