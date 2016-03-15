@@ -38,7 +38,7 @@ class Application extends \samsoncms\app\material\Application
     public $hide = true;
 
     /** @var int Catalog root structure identifier */
-    public $catalogID = 12;
+    public $catalogID = 0;
 
     /** @var array System structures array */
     public $systemStructureIDs = array(0);
