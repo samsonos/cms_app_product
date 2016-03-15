@@ -47,5 +47,5 @@ Take a look on the example of [SamsonCMS](https://github.com/samsoncms/cms) e-co
             * ```__CATALOG_SUB_SUB_CATEGORY```
             * ```__CATALOG_SUB_SUB_CATEGORY```
 
-In this example you must set ```$catalogID``` in configuration equal to ```__CATALOG_CATEGORY``` identifier.
+In this example you must set ```$catalogID``` in configuration equal to ```__CATALOG_ROOT_STRUCTURE``` identifier.
 
