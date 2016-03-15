@@ -1,0 +1,3 @@
+<div class="table2-col" style="overflow: hidden; text-align: center;">
+    <input type="checkbox" value="<?php iv('chbId') ?>" name="materialIds[]">
+</div>
