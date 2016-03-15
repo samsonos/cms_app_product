@@ -1,4 +1,4 @@
-# SamsonCMS product catalog management module
+# SamsonCMS product application 
 
 [![Total Downloads](https://poser.pugx.org/samsonos/cms_app_product/downloads.svg)](https://packagist.org/packages/samsonos/cms_app_product)
 
